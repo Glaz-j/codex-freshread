@@ -318,6 +318,14 @@ class FreshReadEngine {
     return changed;
   }
 
+  _expectedIdentityPath(filePath) {
+    const canonical = canonicalPath(this.cwd, filePath);
+    if (!canonical || !isWithin(this.cwd, canonical)) return null;
+    const relative = path.relative(this.cwd, canonical);
+    const expected = path.normalize(path.resolve(this.realCwd, relative));
+    return isWithin(this.realCwd, expected) ? expected : null;
+  }
+
   _findRecord(state, filePath, resolution = null) {
     const canonical = canonicalPath(this.cwd, filePath);
     if (!canonical) return { canonical: null, identityPath: null, key: null, record: null };
@@ -357,11 +365,15 @@ class FreshReadEngine {
         }
       }
       for (const [key, record] of entries) {
-        // A normal file's lexical path and remembered identity are identical, so
-        // resolving it again cannot reveal an alias retarget. Restrict this
-        // fallback to records that were actually reached through an alias. This
-        // preserves retarget detection without making N ordinary reads O(N^2).
-        if (pathKey(record.path) === pathKey(recordIdentityPath(record))) continue;
+        // Translate the lexical path relative to the lexical workspace root onto
+        // the bound physical root. A difference caused only by the root spelling
+        // (/var vs /private/var, a junction, or a Windows short path) is not an
+        // inner alias and cannot benefit from another filesystem resolution.
+        // Records whose remembered identity differs from this expected target
+        // still contain an inner alias and must be resolved to detect retargets.
+        const expectedIdentity = this._expectedIdentityPath(record.path);
+        if (expectedIdentity &&
+            pathKey(expectedIdentity) === pathKey(recordIdentityPath(record))) continue;
         const recordResolution = this._resolvePath(record.path);
         if (recordResolution.realPath && pathKey(recordResolution.realPath) === identityKey) {
           return { canonical, identityPath, key, record };

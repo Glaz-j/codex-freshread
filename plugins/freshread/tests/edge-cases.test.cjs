@@ -136,6 +136,37 @@ test("recording ordinary files keeps path-resolution work linear", (t) => {
     `expected linear path-resolution work, observed ${engine.metrics.statCalls} stat calls`);
 });
 
+test("recording ordinary files through an aliased workspace root keeps path-resolution work linear", (t) => {
+  const physicalParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-linear-physical-"));
+  const aliasParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-linear-alias-"));
+  const physicalRoot = path.join(physicalParent, "workspace");
+  const aliasRoot = path.join(aliasParent, "workspace-link");
+  fs.mkdirSync(physicalRoot);
+  fs.symlinkSync(physicalRoot, aliasRoot, process.platform === "win32" ? "junction" : "dir");
+  t.after(() => {
+    try { fs.unlinkSync(aliasRoot); } catch {}
+    fs.rmSync(aliasParent, { recursive: true, force: true });
+    fs.rmSync(physicalParent, { recursive: true, force: true });
+  });
+
+  const engine = new FreshReadEngine({
+    cwd: aliasRoot,
+    dataDir: path.join(physicalParent, ".plugin-data"),
+    sessionId: "aliased-linear-session",
+  });
+  const files = Array.from({ length: 100 }, (_, index) => {
+    const physicalFile = path.join(physicalRoot, "src", `linear-${index}.ts`);
+    fs.mkdirSync(path.dirname(physicalFile), { recursive: true });
+    fs.writeFileSync(physicalFile, `export const n = ${index};\n`);
+    return path.join(aliasRoot, "src", `linear-${index}.ts`);
+  });
+
+  for (const filePath of files) assert.equal(engine.recordRead(filePath).state, STATES.FRESH);
+  assert.equal(engine.checkAll().summary.tracked, files.length);
+  assert.ok(engine.metrics.statCalls <= files.length * 4,
+    `expected linear root-alias path-resolution work, observed ${engine.metrics.statCalls} stat calls`);
+});
+
 test("oversized and outside-workspace symlink targets fail visible as UNKNOWN", (t) => {
   const fx = fixture(t);
   const oversized = fx.file("src/large.bin", Buffer.alloc(32));

@@ -7,7 +7,7 @@ const os = require("node:os");
 const path = require("node:path");
 const test = require("node:test");
 
-const { FreshReadEngine } = require("../src/freshread-core.cjs");
+const { FreshReadEngine, pathKey } = require("../src/freshread-core.cjs");
 const {
   consumeToolEvidence,
   exactObservedReadPlan,
@@ -297,6 +297,9 @@ test("verified reader opens the resolved in-workspace target when its alias is r
   const aliasDirectory = path.join(fx.root, "reader-link");
   fs.symlinkSync(insideDirectory, aliasDirectory, process.platform === "win32" ? "junction" : "dir");
   const aliasFile = path.join(aliasDirectory, "secret.ts");
+  const insideFile = path.join(insideDirectory, "secret.ts");
+  const openedTargetKeys = new Set([aliasFile, insideFile, fs.realpathSync.native(insideFile)]
+    .map((item) => pathKey(path.resolve(item))));
   const event = fx.event("retarget-before-open", process.platform === "win32"
     ? "Get-Content -LiteralPath '.\\reader-link\\secret.ts' -Raw -Encoding utf8"
     : "cat reader-link/secret.ts");
@@ -308,8 +311,7 @@ test("verified reader opens the resolved in-workspace target when its alias is r
   const openSync = fs.openSync;
   let retargeted = false;
   fs.openSync = function retargetBeforeOpen(candidate, flags, mode) {
-    if (!retargeted && [aliasFile, path.join(insideDirectory, "secret.ts")]
-      .some((item) => path.resolve(String(candidate)) === path.resolve(item))) {
+    if (!retargeted && openedTargetKeys.has(pathKey(path.resolve(String(candidate))))) {
       retargeted = true;
       fs.unlinkSync(aliasDirectory);
       fs.symlinkSync(outsideDirectory, aliasDirectory, process.platform === "win32" ? "junction" : "dir");

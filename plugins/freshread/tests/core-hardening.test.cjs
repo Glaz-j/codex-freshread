@@ -35,6 +35,10 @@ function unlinkDirectory(alias) {
   fs.unlinkSync(alias);
 }
 
+function realPathKey(filePath) {
+  return pathKey(fs.realpathSync.native(filePath));
+}
+
 function readEvidence(engine, filePath) {
   const capture = engine._capture(filePath, null, true);
   assert.equal(capture.kind, "file");
@@ -71,8 +75,9 @@ test("realpath identity bridges a directory alias and its real file path", (t) =
 
   assert.equal(engine.recordRead(aliasFile).state, STATES.FRESH);
   const persisted = JSON.parse(fs.readFileSync(engine.statePath, "utf8"));
-  assert.ok(persisted.files[pathKey(realFile)]);
-  assert.equal(pathKey(persisted.files[pathKey(realFile)].identityPath), pathKey(realFile));
+  const realFileKey = realPathKey(realFile);
+  assert.ok(persisted.files[realFileKey]);
+  assert.equal(pathKey(persisted.files[realFileKey].identityPath), realFileKey);
 
   fs.writeFileSync(realFile, "B\n");
   const externalGuard = engine.guardEdit([realFile]);
@@ -94,11 +99,13 @@ test("an aliased workspace root keeps lexical requests and real targets in separ
   const aliasRoot = path.join(aliasParent, "workspace-link");
   const outside = path.join(physicalParent, "outside");
   const escapeAlias = path.join(aliasRoot, "escape-link");
+  const innerAlias = path.join(aliasRoot, "inner-link");
   fs.mkdirSync(physicalRoot);
   fs.mkdirSync(outside);
   linkDirectory(physicalRoot, aliasRoot);
   t.after(() => {
     try { unlinkDirectory(escapeAlias); } catch {}
+    try { unlinkDirectory(innerAlias); } catch {}
     try { unlinkDirectory(aliasRoot); } catch {}
     fs.rmSync(aliasParent, { recursive: true, force: true });
     fs.rmSync(physicalParent, { recursive: true, force: true });
@@ -130,6 +137,19 @@ test("an aliased workspace root keeps lexical requests and real targets in separ
   assert.equal(physicalSpelling.files[0].state, STATES.UNKNOWN);
   assert.match(physicalSpelling.files[0].detail, /outside the workspace scope/i);
 
+  const originalPhysical = path.join(physicalRoot, "original", "inner.ts");
+  const replacementPhysical = path.join(physicalRoot, "replacement", "inner.ts");
+  fs.mkdirSync(path.dirname(originalPhysical), { recursive: true });
+  fs.mkdirSync(path.dirname(replacementPhysical), { recursive: true });
+  fs.writeFileSync(originalPhysical, "original\n");
+  fs.writeFileSync(replacementPhysical, "replacement\n");
+  linkDirectory(path.dirname(originalPhysical), innerAlias);
+  assert.equal(engine.recordRead(path.join(innerAlias, "inner.ts")).state, STATES.FRESH);
+  unlinkDirectory(innerAlias);
+  linkDirectory(path.dirname(replacementPhysical), innerAlias);
+  const innerRetarget = engine.inspect(path.join(aliasRoot, "replacement", "inner.ts"), { forceHash: true });
+  assert.equal(innerRetarget.state, STATES.STALE_EXTERNAL);
+
   linkDirectory(outside, escapeAlias);
   const escapedMissing = engine.guardEdit([path.join(escapeAlias, "new.ts")]);
   assert.equal(escapedMissing.blocked, true);
@@ -158,8 +178,9 @@ test("legacy alias-keyed state migrates and guards writes through the real path"
   assert.equal(result.files[0].state, STATES.STALE_EXTERNAL);
 
   const migrated = JSON.parse(fs.readFileSync(reloaded.statePath, "utf8"));
-  assert.ok(migrated.files[pathKey(realFile)]);
-  assert.equal(pathKey(migrated.files[pathKey(realFile)].identityPath), pathKey(realFile));
+  const realFileKey = realPathKey(realFile);
+  assert.ok(migrated.files[realFileKey]);
+  assert.equal(pathKey(migrated.files[realFileKey].identityPath), realFileKey);
   assert.equal(migrated.files[pathKey(aliasFile)], undefined);
 });
 
@@ -196,10 +217,12 @@ test("retargeted aliases remain valid state and resolve from the new real path",
   const result = engine.inspect(replacement, { forceHash: true });
   assert.equal(result.state, STATES.STALE_EXTERNAL);
   const persisted = JSON.parse(fs.readFileSync(engine.statePath, "utf8"));
-  const record = persisted.files[pathKey(original)];
+  const originalKey = realPathKey(original);
+  const replacementKey = realPathKey(replacement);
+  const record = persisted.files[originalKey];
   assert.ok(record);
-  assert.equal(pathKey(record.identityPath), pathKey(original));
-  assert.equal(pathKey(record.observation.metadata.realPath), pathKey(replacement));
+  assert.equal(pathKey(record.identityPath), originalKey);
+  assert.equal(pathKey(record.observation.metadata.realPath), replacementKey);
 
   const reloaded = fx.engine("retargeted-alias-session").checkAll({ forceHash: true });
   assert.equal(reloaded.corrupt, false);
@@ -208,8 +231,8 @@ test("retargeted aliases remain valid state and resolve from the new real path",
   assert.equal(engine.recordRead(aliasFile).state, STATES.FRESH);
   const reread = JSON.parse(fs.readFileSync(engine.statePath, "utf8"));
   assert.equal(Object.keys(reread.files).length, 1);
-  assert.equal(reread.files[pathKey(original)], undefined);
-  assert.ok(reread.files[pathKey(replacement)]);
+  assert.equal(reread.files[originalKey], undefined);
+  assert.ok(reread.files[replacementKey]);
 });
 
 test("self writes through a retargeted alias keep the read-time identity key", (t) => {
@@ -228,10 +251,12 @@ test("self writes through a retargeted alias keep the read-time identity key", (
 
   assert.equal(engine.recordSelfWrite(replacement).state, STATES.STALE_SELF);
   const persisted = JSON.parse(fs.readFileSync(engine.statePath, "utf8"));
-  assert.ok(persisted.files[pathKey(original)]);
-  assert.equal(persisted.files[pathKey(replacement)], undefined);
-  assert.equal(pathKey(persisted.files[pathKey(original)].identityPath), pathKey(original));
-  assert.equal(pathKey(persisted.files[pathKey(original)].observation.metadata.realPath), pathKey(replacement));
+  const originalKey = realPathKey(original);
+  const replacementKey = realPathKey(replacement);
+  assert.ok(persisted.files[originalKey]);
+  assert.equal(persisted.files[replacementKey], undefined);
+  assert.equal(pathKey(persisted.files[originalKey].identityPath), originalKey);
+  assert.equal(pathKey(persisted.files[originalKey].observation.metadata.realPath), replacementKey);
 
   const reloaded = fx.engine("retargeted-self-session").inspect(replacement, { forceHash: true });
   assert.equal(reloaded.state, STATES.STALE_SELF);
@@ -575,7 +600,7 @@ test("verified reads preserve emitted bytes when the file changes before PostToo
   assert.notEqual(result.currentHash, evidence.hash);
 
   const persisted = JSON.parse(fs.readFileSync(engine.statePath, "utf8"));
-  const record = persisted.files[pathKey(target)];
+  const record = persisted.files[realPathKey(target)];
   assert.equal(record.snapshot.hash, evidence.hash);
   assert.equal(record.snapshot.readAt, evidence.readAt);
   assert.equal(record.observation.hash, result.currentHash);
