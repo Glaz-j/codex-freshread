@@ -1,9 +1,9 @@
 {
   "schemaVersion": 3,
-  "generatedAt": "2026-08-24T07:48:46.930Z",
+  "generatedAt": "2026-08-24T14:19:40.797Z",
   "sourceTree": {
     "algorithm": "SHA-256",
-    "digest": "769ff2c603e652282be5c4a09a3fac249ddd50e407d2c55bc96e4b9d74873ca8",
+    "digest": "0e6d4f96afe7fe1ced8d1afc26cac5f8e857b55acbdd203cafc9f26d71c41f0e",
     "fileCount": 30,
     "excludes": [
       "node_modules/**",
@@ -12,9 +12,9 @@
     ]
   },
   "environment": {
-    "platform": "win32",
+    "platform": "linux",
     "arch": "x64",
-    "node": "v24.15.0"
+    "node": "v20.20.2"
   },
   "executionProfile": {
     "name": "full-release",
@@ -866,16 +866,16 @@
       "seededFiles": 100,
       "trackedFiles": 100,
       "iterations": 20,
-      "p50Ms": 24.457600000000184,
-      "p95Ms": 26.04690000000005,
-      "p99Ms": 27.377299999999877,
+      "p50Ms": 4.092501999999968,
+      "p95Ms": 6.831537000000026,
+      "p99Ms": 7.1242849999998725,
       "unchangedCheckpointHashCalls": 0,
       "statCalls": 2399,
       "bytesHashed": 2090,
-      "readPhaseDurationMs": 814.5965000000001,
-      "nthReadMs": 11.001999999999953,
+      "readPhaseDurationMs": 298.01615000000015,
+      "nthReadMs": 4.428773000000092,
       "nearNthReadSampleCount": 10,
-      "nearNthReadP95Ms": 11.210400000000163,
+      "nearNthReadP95Ms": 4.48949599999969,
       "readPhaseStatCalls": 299,
       "readPhaseHashCalls": 100,
       "readPhaseBytesHashed": 2090,
@@ -884,9 +884,9 @@
       "populatedHookSpawn": {
         "enabled": true,
         "iterations": 8,
-        "p50Ms": 695.0090999999957,
-        "p95Ms": 704.8234999999986,
-        "p99Ms": 704.8234999999986,
+        "p50Ms": 121.87822599999708,
+        "p95Ms": 123.61629399999947,
+        "p99Ms": 123.61629399999947,
         "failures": []
       },
       "cases": {
@@ -894,16 +894,16 @@
           "seededFiles": 100,
           "trackedFiles": 100,
           "iterations": 20,
-          "p50Ms": 24.457600000000184,
-          "p95Ms": 26.04690000000005,
-          "p99Ms": 27.377299999999877,
+          "p50Ms": 4.092501999999968,
+          "p95Ms": 6.831537000000026,
+          "p99Ms": 7.1242849999998725,
           "unchangedCheckpointHashCalls": 0,
           "statCalls": 2399,
           "bytesHashed": 2090,
-          "readPhaseDurationMs": 814.5965000000001,
-          "nthReadMs": 11.001999999999953,
+          "readPhaseDurationMs": 298.01615000000015,
+          "nthReadMs": 4.428773000000092,
           "nearNthReadSampleCount": 10,
-          "nearNthReadP95Ms": 11.210400000000163,
+          "nearNthReadP95Ms": 4.48949599999969,
           "readPhaseStatCalls": 299,
           "readPhaseHashCalls": 100,
           "readPhaseBytesHashed": 2090,
@@ -915,16 +915,16 @@
           "seededFiles": 1000,
           "trackedFiles": 1000,
           "iterations": 8,
-          "p50Ms": 226.97509999999966,
-          "p95Ms": 237.58140000000276,
-          "p99Ms": 237.58140000000276,
+          "p50Ms": 35.22036300000036,
+          "p95Ms": 39.469944000000396,
+          "p99Ms": 39.469944000000396,
           "unchangedCheckpointHashCalls": 0,
           "statCalls": 11999,
           "bytesHashed": 21890,
-          "readPhaseDurationMs": 25755.6803,
-          "nthReadMs": 47.95720000000074,
+          "readPhaseDurationMs": 18344.912447000002,
+          "nthReadMs": 35.78467399999863,
           "nearNthReadSampleCount": 10,
-          "nearNthReadP95Ms": 50.06109999999899,
+          "nearNthReadP95Ms": 36.99598200000037,
           "readPhaseStatCalls": 2999,
           "readPhaseHashCalls": 1000,
           "readPhaseBytesHashed": 21890,
@@ -936,17 +936,17 @@
             "baseline": {
               "enabled": false,
               "iterations": 8,
-              "p50Ms": 432.5500000000029,
-              "p95Ms": 487.21360000000277,
-              "p99Ms": 487.21360000000277,
+              "p50Ms": 41.279310000001715,
+              "p95Ms": 43.179551000001084,
+              "p99Ms": 43.179551000001084,
               "failures": []
             },
             "freshread": {
               "enabled": true,
               "iterations": 8,
-              "p50Ms": 695.0090999999957,
-              "p95Ms": 704.8234999999986,
-              "p99Ms": 704.8234999999986,
+              "p50Ms": 121.87822599999708,
+              "p95Ms": 123.61629399999947,
+              "p99Ms": 123.61629399999947,
               "failures": []
             }
           }
@@ -955,16 +955,16 @@
       "coldHookSpawn": {
         "enabled": true,
         "iterations": 20,
-        "p50Ms": 427.00799999999435,
-        "p95Ms": 459.2690999999977,
-        "p99Ms": 474.26640000000043,
+        "p50Ms": 42.84288300000003,
+        "p95Ms": 45.29310699999999,
+        "p99Ms": 45.478894000000025,
         "failures": []
       },
       "readGrowth": {
-        "nthReadMs": 47.95720000000074,
-        "nearNthReadP95Ms": 50.06109999999899,
+        "nthReadMs": 35.78467399999863,
+        "nearNthReadP95Ms": 36.99598200000037,
         "nearNthReadSampleCount": 10,
-        "readPhaseDurationMs": 25755.6803,
+        "readPhaseDurationMs": 18344.912447000002,
         "readPhaseStatCalls": 2999,
         "readPhaseHashCalls": 1000,
         "readPhaseStateReads": 1000,
@@ -975,16 +975,16 @@
       "seededFiles": 100,
       "trackedFiles": 100,
       "iterations": 20,
-      "p50Ms": 6.0750000000000455,
-      "p95Ms": 6.588300000000004,
-      "p99Ms": 6.677900000000022,
+      "p50Ms": 0.5893139999998311,
+      "p95Ms": 0.7571399999999358,
+      "p99Ms": 0.761887999999999,
       "unchangedCheckpointHashCalls": 0,
       "statCalls": 2100,
       "bytesHashed": 0,
-      "readPhaseDurationMs": 0.20050000000003365,
-      "nthReadMs": 0.001199999999926149,
+      "readPhaseDurationMs": 0.24553999999989173,
+      "nthReadMs": 0.0010419999998703133,
       "nearNthReadSampleCount": 10,
-      "nearNthReadP95Ms": 0.003399999999942338,
+      "nearNthReadP95Ms": 0.003336999999874024,
       "readPhaseStatCalls": 0,
       "readPhaseHashCalls": 0,
       "readPhaseBytesHashed": 0,
@@ -993,9 +993,9 @@
       "populatedHookSpawn": {
         "enabled": false,
         "iterations": 8,
-        "p50Ms": 432.5500000000029,
-        "p95Ms": 487.21360000000277,
-        "p99Ms": 487.21360000000277,
+        "p50Ms": 41.279310000001715,
+        "p95Ms": 43.179551000001084,
+        "p99Ms": 43.179551000001084,
         "failures": []
       },
       "cases": {
@@ -1003,16 +1003,16 @@
           "seededFiles": 100,
           "trackedFiles": 100,
           "iterations": 20,
-          "p50Ms": 6.0750000000000455,
-          "p95Ms": 6.588300000000004,
-          "p99Ms": 6.677900000000022,
+          "p50Ms": 0.5893139999998311,
+          "p95Ms": 0.7571399999999358,
+          "p99Ms": 0.761887999999999,
           "unchangedCheckpointHashCalls": 0,
           "statCalls": 2100,
           "bytesHashed": 0,
-          "readPhaseDurationMs": 0.20050000000003365,
-          "nthReadMs": 0.001199999999926149,
+          "readPhaseDurationMs": 0.24553999999989173,
+          "nthReadMs": 0.0010419999998703133,
           "nearNthReadSampleCount": 10,
-          "nearNthReadP95Ms": 0.003399999999942338,
+          "nearNthReadP95Ms": 0.003336999999874024,
           "readPhaseStatCalls": 0,
           "readPhaseHashCalls": 0,
           "readPhaseBytesHashed": 0,
@@ -1024,16 +1024,16 @@
           "seededFiles": 1000,
           "trackedFiles": 1000,
           "iterations": 8,
-          "p50Ms": 62.82349999999997,
-          "p95Ms": 67.14730000000009,
-          "p99Ms": 67.14730000000009,
+          "p50Ms": 3.5831570000000283,
+          "p95Ms": 4.564777000000049,
+          "p99Ms": 4.564777000000049,
           "unchangedCheckpointHashCalls": 0,
           "statCalls": 9000,
           "bytesHashed": 0,
-          "readPhaseDurationMs": 0.8771999999999025,
-          "nthReadMs": 0.0009000000000014552,
+          "readPhaseDurationMs": 0.6954129999999168,
+          "nthReadMs": 0.0008419999999205174,
           "nearNthReadSampleCount": 10,
-          "nearNthReadP95Ms": 0.0016999999998006388,
+          "nearNthReadP95Ms": 0.0017130000001088774,
           "readPhaseStatCalls": 0,
           "readPhaseHashCalls": 0,
           "readPhaseBytesHashed": 0,
@@ -1045,22 +1045,22 @@
       "coldHookSpawn": {
         "enabled": false,
         "iterations": 20,
-        "p50Ms": 425.4317999999985,
-        "p95Ms": 468.79320000000007,
-        "p99Ms": 470.709299999995,
+        "p50Ms": 41.337895,
+        "p95Ms": 43.53676199999995,
+        "p99Ms": 43.733655,
         "failures": []
       },
       "readGrowth": {
-        "nthReadMs": 0.0009000000000014552,
-        "nearNthReadP95Ms": 0.0016999999998006388,
-        "readPhaseDurationMs": 0.8771999999999025,
+        "nthReadMs": 0.0008419999999205174,
+        "nearNthReadP95Ms": 0.0017130000001088774,
+        "readPhaseDurationMs": 0.6954129999999168,
         "readPhaseStatCalls": 0
       }
     },
     "performanceComparison": {
       "cases": {
         "100": {
-          "p95DeltaMs": 19.458600000000047,
+          "p95DeltaMs": 6.07439700000009,
           "p95BudgetMs": 50,
           "p95AbsoluteBudgetMs": 50,
           "p95DeltaBudgetMs": 30,
@@ -1071,7 +1071,7 @@
           "unchangedCheckpointHashPassed": true
         },
         "1000": {
-          "p95DeltaMs": 170.43410000000267,
+          "p95DeltaMs": 34.90516700000035,
           "p95BudgetMs": 400,
           "p95AbsoluteBudgetMs": 400,
           "p95DeltaBudgetMs": 300,
@@ -1088,23 +1088,23 @@
         "key": "1000",
         "files": 1000,
         "baseline": {
-          "nthReadMs": 0.0009000000000014552,
-          "nearNthReadP95Ms": 0.0016999999998006388,
-          "readPhaseDurationMs": 0.8771999999999025,
+          "nthReadMs": 0.0008419999999205174,
+          "nearNthReadP95Ms": 0.0017130000001088774,
+          "readPhaseDurationMs": 0.6954129999999168,
           "readPhaseStatCalls": 0
         },
         "freshread": {
-          "nthReadMs": 47.95720000000074,
-          "nearNthReadP95Ms": 50.06109999999899,
+          "nthReadMs": 35.78467399999863,
+          "nearNthReadP95Ms": 36.99598200000037,
           "nearNthReadSampleCount": 10,
-          "readPhaseDurationMs": 25755.6803,
+          "readPhaseDurationMs": 18344.912447000002,
           "readPhaseStatCalls": 2999,
           "readPhaseHashCalls": 1000,
           "readPhaseStateReads": 1000,
           "readPhaseStateWrites": 1000
         },
         "nthReadLatency": {
-          "p95DeltaMs": 47.95630000000074,
+          "p95DeltaMs": 35.78383199999871,
           "p95BudgetMs": 150,
           "p95AbsoluteBudgetMs": 150,
           "p95DeltaBudgetMs": 125,
@@ -1113,7 +1113,7 @@
           "passed": true
         },
         "nearNthReadLatency": {
-          "p95DeltaMs": 50.05939999999919,
+          "p95DeltaMs": 36.99426900000026,
           "p95BudgetMs": 150,
           "p95AbsoluteBudgetMs": 150,
           "p95DeltaBudgetMs": 125,
@@ -1127,14 +1127,14 @@
         "passed": true
       },
       "coldHookSpawn": {
-        "p95DeltaMs": 20.303500000001804,
+        "p95DeltaMs": 3.5872980000000325,
         "p95BudgetMs": 500,
         "p95AbsoluteBudgetMs": 500,
         "p95DeltaBudgetMs": 100,
         "deltaMethod": "paired-freshread-minus-baseline",
-        "pairedDeltaP50Ms": -3.31420000000071,
-        "pairedDeltaP95Ms": 20.303500000001804,
-        "pairedDeltaP99Ms": 22.635699999998906,
+        "pairedDeltaP50Ms": 1.8764809999998988,
+        "pairedDeltaP95Ms": 3.5872980000000325,
+        "pairedDeltaP99Ms": 4.126315000000034,
         "absolutePassed": true,
         "deltaPassed": true,
         "passed": true,
@@ -1143,17 +1143,17 @@
         "baseline": {
           "enabled": false,
           "iterations": 20,
-          "p50Ms": 425.4317999999985,
-          "p95Ms": 468.79320000000007,
-          "p99Ms": 470.709299999995,
+          "p50Ms": 41.337895,
+          "p95Ms": 43.53676199999995,
+          "p99Ms": 43.733655,
           "failures": []
         },
         "freshread": {
           "enabled": true,
           "iterations": 20,
-          "p50Ms": 427.00799999999435,
-          "p95Ms": 459.2690999999977,
-          "p99Ms": 474.26640000000043,
+          "p50Ms": 42.84288300000003,
+          "p95Ms": 45.29310699999999,
+          "p99Ms": 45.478894000000025,
           "failures": []
         },
         "pairs": [
@@ -1164,16 +1164,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 413.6814000000013,
+              "durationMs": 41.86868099999998,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 418.83150000000023,
+              "durationMs": 45.29310699999999,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 5.150099999998929
+            "deltaMs": 3.424426000000011
           },
           {
             "pairIndex": 1,
@@ -1182,16 +1182,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 413.8501000000033,
+              "durationMs": 41.337895,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 436.4858000000022,
+              "durationMs": 41.48682099999999,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 22.635699999998906
+            "deltaMs": 0.1489259999999888
           },
           {
             "pairIndex": 2,
@@ -1200,16 +1200,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 422.0815999999977,
+              "durationMs": 40.830516999999986,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 414.60149999999703,
+              "durationMs": 44.41781500000002,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -7.480100000000675
+            "deltaMs": 3.5872980000000325
           },
           {
             "pairIndex": 3,
@@ -1218,16 +1218,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 432.6116000000038,
+              "durationMs": 41.35257899999999,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 444.67349999999715,
+              "durationMs": 45.478894000000025,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 12.06189999999333
+            "deltaMs": 4.126315000000034
           },
           {
             "pairIndex": 4,
@@ -1236,16 +1236,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 431.25479999999516,
+              "durationMs": 39.81020799999999,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 421.60459999999875,
+              "durationMs": 42.84288300000003,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -9.650199999996403
+            "deltaMs": 3.03267500000004
           },
           {
             "pairIndex": 5,
@@ -1254,16 +1254,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 442.23099999999977,
+              "durationMs": 40.63609599999995,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 436.84070000000065,
+              "durationMs": 44.18932700000005,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -5.390299999999115
+            "deltaMs": 3.553231000000096
           },
           {
             "pairIndex": 6,
@@ -1272,16 +1272,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 455.6793000000034,
+              "durationMs": 41.41628800000001,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 459.2690999999977,
+              "durationMs": 43.56779700000004,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 3.589799999994284
+            "deltaMs": 2.1515090000000328
           },
           {
             "pairIndex": 7,
@@ -1290,16 +1290,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 468.79320000000007,
+              "durationMs": 41.467799000000014,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 452.51640000000043,
+              "durationMs": 42.80949099999998,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -16.27679999999964
+            "deltaMs": 1.3416919999999664
           },
           {
             "pairIndex": 8,
@@ -1308,16 +1308,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 470.709299999995,
+              "durationMs": 42.57934899999998,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 474.26640000000043,
+              "durationMs": 43.867924000000016,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 3.5571000000054482
+            "deltaMs": 1.288575000000037
           },
           {
             "pairIndex": 9,
@@ -1326,16 +1326,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 444.35280000000057,
+              "durationMs": 40.85386100000005,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 440.4890000000014,
+              "durationMs": 43.41219000000001,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -3.8637999999991735
+            "deltaMs": 2.558328999999958
           },
           {
             "pairIndex": 10,
@@ -1344,16 +1344,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 417.6175000000003,
+              "durationMs": 40.35137300000008,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 420.607600000003,
+              "durationMs": 42.22785399999998,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 2.9901000000027125
+            "deltaMs": 1.8764809999998988
           },
           {
             "pairIndex": 11,
@@ -1362,16 +1362,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 418.33320000000094,
+              "durationMs": 41.93007700000021,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 423.79349999999977,
+              "durationMs": 42.15366700000004,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 5.460299999998824
+            "deltaMs": 0.22358999999983098
           },
           {
             "pairIndex": 12,
@@ -1380,16 +1380,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 420.86439999999857,
+              "durationMs": 41.244020999999975,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 417.55019999999786,
+              "durationMs": 41.39611100000002,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -3.31420000000071
+            "deltaMs": 0.1520900000000438
           },
           {
             "pairIndex": 13,
@@ -1398,16 +1398,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 423.681399999994,
+              "durationMs": 43.16132500000003,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 414.69869999999355,
+              "durationMs": 42.36068299999988,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -8.982700000000477
+            "deltaMs": -0.8006420000001526
           },
           {
             "pairIndex": 14,
@@ -1416,16 +1416,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 425.4317999999985,
+              "durationMs": 40.466544999999996,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 427.00799999999435,
+              "durationMs": 42.70448699999997,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 1.576199999995879
+            "deltaMs": 2.2379419999999755
           },
           {
             "pairIndex": 15,
@@ -1434,16 +1434,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 419.3280999999988,
+              "durationMs": 40.609702999999854,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 439.6316000000006,
+              "durationMs": 42.816753999999946,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 20.303500000001804
+            "deltaMs": 2.2070510000000922
           },
           {
             "pairIndex": 16,
@@ -1452,16 +1452,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 431.0077999999994,
+              "durationMs": 41.48368499999992,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 424.4147000000012,
+              "durationMs": 43.233375000000024,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -6.5930999999982305
+            "deltaMs": 1.7496900000001006
           },
           {
             "pairIndex": 17,
@@ -1470,16 +1470,16 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 465.7436000000016,
+              "durationMs": 43.53676199999995,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 441.74809999999707,
+              "durationMs": 42.53614799999991,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -23.99550000000454
+            "deltaMs": -1.0006140000000414
           },
           {
             "pairIndex": 18,
@@ -1488,16 +1488,16 @@
               "freshread"
             ],
             "baseline": {
-              "durationMs": 418.0873000000065,
+              "durationMs": 43.733655,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 427.16689999999653,
+              "durationMs": 44.67897500000004,
               "status": 0,
               "signal": null
             },
-            "deltaMs": 9.079599999990023
+            "deltaMs": 0.9453200000000379
           },
           {
             "pairIndex": 19,
@@ -1506,23 +1506,23 @@
               "baseline"
             ],
             "baseline": {
-              "durationMs": 441.1469999999972,
+              "durationMs": 40.397698999999875,
               "status": 0,
               "signal": null
             },
             "freshread": {
-              "durationMs": 425.2534999999989,
+              "durationMs": 43.11358100000007,
               "status": 0,
               "signal": null
             },
-            "deltaMs": -15.893499999998312
+            "deltaMs": 2.7158820000001924
           }
         ],
         "required": true,
         "status": "RUN"
       },
       "populatedHookSpawn": {
-        "p95DeltaMs": 217.60989999999583,
+        "p95DeltaMs": 80.43674299999839,
         "p95BudgetMs": 900,
         "p95AbsoluteBudgetMs": 900,
         "p95DeltaBudgetMs": 400,
@@ -1534,17 +1534,17 @@
         "baseline": {
           "enabled": false,
           "iterations": 8,
-          "p50Ms": 432.5500000000029,
-          "p95Ms": 487.21360000000277,
-          "p99Ms": 487.21360000000277,
+          "p50Ms": 41.279310000001715,
+          "p95Ms": 43.179551000001084,
+          "p99Ms": 43.179551000001084,
           "failures": []
         },
         "freshread": {
           "enabled": true,
           "iterations": 8,
-          "p50Ms": 695.0090999999957,
-          "p95Ms": 704.8234999999986,
-          "p99Ms": 704.8234999999986,
+          "p50Ms": 121.87822599999708,
+          "p95Ms": 123.61629399999947,
+          "p99Ms": 123.61629399999947,
           "failures": []
         },
         "required": true,
@@ -1756,16 +1756,16 @@
               "seededFiles": 100,
               "trackedFiles": 100,
               "iterations": 20,
-              "p50Ms": 6.0750000000000455,
-              "p95Ms": 6.588300000000004,
-              "p99Ms": 6.677900000000022,
+              "p50Ms": 0.5893139999998311,
+              "p95Ms": 0.7571399999999358,
+              "p99Ms": 0.761887999999999,
               "unchangedCheckpointHashCalls": 0,
               "statCalls": 2100,
               "bytesHashed": 0,
-              "readPhaseDurationMs": 0.20050000000003365,
-              "nthReadMs": 0.001199999999926149,
+              "readPhaseDurationMs": 0.24553999999989173,
+              "nthReadMs": 0.0010419999998703133,
               "nearNthReadSampleCount": 10,
-              "nearNthReadP95Ms": 0.003399999999942338,
+              "nearNthReadP95Ms": 0.003336999999874024,
               "readPhaseStatCalls": 0,
               "readPhaseHashCalls": 0,
               "readPhaseBytesHashed": 0,
@@ -1777,16 +1777,16 @@
               "seededFiles": 1000,
               "trackedFiles": 1000,
               "iterations": 8,
-              "p50Ms": 62.82349999999997,
-              "p95Ms": 67.14730000000009,
-              "p99Ms": 67.14730000000009,
+              "p50Ms": 3.5831570000000283,
+              "p95Ms": 4.564777000000049,
+              "p99Ms": 4.564777000000049,
               "unchangedCheckpointHashCalls": 0,
               "statCalls": 9000,
               "bytesHashed": 0,
-              "readPhaseDurationMs": 0.8771999999999025,
-              "nthReadMs": 0.0009000000000014552,
+              "readPhaseDurationMs": 0.6954129999999168,
+              "nthReadMs": 0.0008419999999205174,
               "nearNthReadSampleCount": 10,
-              "nearNthReadP95Ms": 0.0016999999998006388,
+              "nearNthReadP95Ms": 0.0017130000001088774,
               "readPhaseStatCalls": 0,
               "readPhaseHashCalls": 0,
               "readPhaseBytesHashed": 0,
@@ -1800,16 +1800,16 @@
               "seededFiles": 100,
               "trackedFiles": 100,
               "iterations": 20,
-              "p50Ms": 24.457600000000184,
-              "p95Ms": 26.04690000000005,
-              "p99Ms": 27.377299999999877,
+              "p50Ms": 4.092501999999968,
+              "p95Ms": 6.831537000000026,
+              "p99Ms": 7.1242849999998725,
               "unchangedCheckpointHashCalls": 0,
               "statCalls": 2399,
               "bytesHashed": 2090,
-              "readPhaseDurationMs": 814.5965000000001,
-              "nthReadMs": 11.001999999999953,
+              "readPhaseDurationMs": 298.01615000000015,
+              "nthReadMs": 4.428773000000092,
               "nearNthReadSampleCount": 10,
-              "nearNthReadP95Ms": 11.210400000000163,
+              "nearNthReadP95Ms": 4.48949599999969,
               "readPhaseStatCalls": 299,
               "readPhaseHashCalls": 100,
               "readPhaseBytesHashed": 2090,
@@ -1821,16 +1821,16 @@
               "seededFiles": 1000,
               "trackedFiles": 1000,
               "iterations": 8,
-              "p50Ms": 226.97509999999966,
-              "p95Ms": 237.58140000000276,
-              "p99Ms": 237.58140000000276,
+              "p50Ms": 35.22036300000036,
+              "p95Ms": 39.469944000000396,
+              "p99Ms": 39.469944000000396,
               "unchangedCheckpointHashCalls": 0,
               "statCalls": 11999,
               "bytesHashed": 21890,
-              "readPhaseDurationMs": 25755.6803,
-              "nthReadMs": 47.95720000000074,
+              "readPhaseDurationMs": 18344.912447000002,
+              "nthReadMs": 35.78467399999863,
               "nearNthReadSampleCount": 10,
-              "nearNthReadP95Ms": 50.06109999999899,
+              "nearNthReadP95Ms": 36.99598200000037,
               "readPhaseStatCalls": 2999,
               "readPhaseHashCalls": 1000,
               "readPhaseBytesHashed": 21890,
@@ -1842,17 +1842,17 @@
                 "baseline": {
                   "enabled": false,
                   "iterations": 8,
-                  "p50Ms": 432.5500000000029,
-                  "p95Ms": 487.21360000000277,
-                  "p99Ms": 487.21360000000277,
+                  "p50Ms": 41.279310000001715,
+                  "p95Ms": 43.179551000001084,
+                  "p99Ms": 43.179551000001084,
                   "failures": []
                 },
                 "freshread": {
                   "enabled": true,
                   "iterations": 8,
-                  "p50Ms": 695.0090999999957,
-                  "p95Ms": 704.8234999999986,
-                  "p99Ms": 704.8234999999986,
+                  "p50Ms": 121.87822599999708,
+                  "p95Ms": 123.61629399999947,
+                  "p99Ms": 123.61629399999947,
                   "failures": []
                 }
               }
@@ -1860,7 +1860,7 @@
           },
           "comparisons": {
             "100": {
-              "p95DeltaMs": 19.458600000000047,
+              "p95DeltaMs": 6.07439700000009,
               "p95BudgetMs": 50,
               "p95AbsoluteBudgetMs": 50,
               "p95DeltaBudgetMs": 30,
@@ -1871,7 +1871,7 @@
               "unchangedCheckpointHashPassed": true
             },
             "1000": {
-              "p95DeltaMs": 170.43410000000267,
+              "p95DeltaMs": 34.90516700000035,
               "p95BudgetMs": 400,
               "p95AbsoluteBudgetMs": 400,
               "p95DeltaBudgetMs": 300,
@@ -1888,23 +1888,23 @@
             "key": "1000",
             "files": 1000,
             "baseline": {
-              "nthReadMs": 0.0009000000000014552,
-              "nearNthReadP95Ms": 0.0016999999998006388,
-              "readPhaseDurationMs": 0.8771999999999025,
+              "nthReadMs": 0.0008419999999205174,
+              "nearNthReadP95Ms": 0.0017130000001088774,
+              "readPhaseDurationMs": 0.6954129999999168,
               "readPhaseStatCalls": 0
             },
             "freshread": {
-              "nthReadMs": 47.95720000000074,
-              "nearNthReadP95Ms": 50.06109999999899,
+              "nthReadMs": 35.78467399999863,
+              "nearNthReadP95Ms": 36.99598200000037,
               "nearNthReadSampleCount": 10,
-              "readPhaseDurationMs": 25755.6803,
+              "readPhaseDurationMs": 18344.912447000002,
               "readPhaseStatCalls": 2999,
               "readPhaseHashCalls": 1000,
               "readPhaseStateReads": 1000,
               "readPhaseStateWrites": 1000
             },
             "nthReadLatency": {
-              "p95DeltaMs": 47.95630000000074,
+              "p95DeltaMs": 35.78383199999871,
               "p95BudgetMs": 150,
               "p95AbsoluteBudgetMs": 150,
               "p95DeltaBudgetMs": 125,
@@ -1913,7 +1913,7 @@
               "passed": true
             },
             "nearNthReadLatency": {
-              "p95DeltaMs": 50.05939999999919,
+              "p95DeltaMs": 36.99426900000026,
               "p95BudgetMs": 150,
               "p95AbsoluteBudgetMs": 150,
               "p95DeltaBudgetMs": 125,
@@ -1927,14 +1927,14 @@
             "passed": true
           },
           "coldHookSpawn": {
-            "p95DeltaMs": 20.303500000001804,
+            "p95DeltaMs": 3.5872980000000325,
             "p95BudgetMs": 500,
             "p95AbsoluteBudgetMs": 500,
             "p95DeltaBudgetMs": 100,
             "deltaMethod": "paired-freshread-minus-baseline",
-            "pairedDeltaP50Ms": -3.31420000000071,
-            "pairedDeltaP95Ms": 20.303500000001804,
-            "pairedDeltaP99Ms": 22.635699999998906,
+            "pairedDeltaP50Ms": 1.8764809999998988,
+            "pairedDeltaP95Ms": 3.5872980000000325,
+            "pairedDeltaP99Ms": 4.126315000000034,
             "absolutePassed": true,
             "deltaPassed": true,
             "passed": true,
@@ -1943,17 +1943,17 @@
             "baseline": {
               "enabled": false,
               "iterations": 20,
-              "p50Ms": 425.4317999999985,
-              "p95Ms": 468.79320000000007,
-              "p99Ms": 470.709299999995,
+              "p50Ms": 41.337895,
+              "p95Ms": 43.53676199999995,
+              "p99Ms": 43.733655,
               "failures": []
             },
             "freshread": {
               "enabled": true,
               "iterations": 20,
-              "p50Ms": 427.00799999999435,
-              "p95Ms": 459.2690999999977,
-              "p99Ms": 474.26640000000043,
+              "p50Ms": 42.84288300000003,
+              "p95Ms": 45.29310699999999,
+              "p99Ms": 45.478894000000025,
               "failures": []
             },
             "pairs": [
@@ -1964,16 +1964,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 413.6814000000013,
+                  "durationMs": 41.86868099999998,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 418.83150000000023,
+                  "durationMs": 45.29310699999999,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 5.150099999998929
+                "deltaMs": 3.424426000000011
               },
               {
                 "pairIndex": 1,
@@ -1982,16 +1982,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 413.8501000000033,
+                  "durationMs": 41.337895,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 436.4858000000022,
+                  "durationMs": 41.48682099999999,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 22.635699999998906
+                "deltaMs": 0.1489259999999888
               },
               {
                 "pairIndex": 2,
@@ -2000,16 +2000,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 422.0815999999977,
+                  "durationMs": 40.830516999999986,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 414.60149999999703,
+                  "durationMs": 44.41781500000002,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -7.480100000000675
+                "deltaMs": 3.5872980000000325
               },
               {
                 "pairIndex": 3,
@@ -2018,16 +2018,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 432.6116000000038,
+                  "durationMs": 41.35257899999999,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 444.67349999999715,
+                  "durationMs": 45.478894000000025,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 12.06189999999333
+                "deltaMs": 4.126315000000034
               },
               {
                 "pairIndex": 4,
@@ -2036,16 +2036,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 431.25479999999516,
+                  "durationMs": 39.81020799999999,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 421.60459999999875,
+                  "durationMs": 42.84288300000003,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -9.650199999996403
+                "deltaMs": 3.03267500000004
               },
               {
                 "pairIndex": 5,
@@ -2054,16 +2054,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 442.23099999999977,
+                  "durationMs": 40.63609599999995,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 436.84070000000065,
+                  "durationMs": 44.18932700000005,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -5.390299999999115
+                "deltaMs": 3.553231000000096
               },
               {
                 "pairIndex": 6,
@@ -2072,16 +2072,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 455.6793000000034,
+                  "durationMs": 41.41628800000001,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 459.2690999999977,
+                  "durationMs": 43.56779700000004,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 3.589799999994284
+                "deltaMs": 2.1515090000000328
               },
               {
                 "pairIndex": 7,
@@ -2090,16 +2090,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 468.79320000000007,
+                  "durationMs": 41.467799000000014,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 452.51640000000043,
+                  "durationMs": 42.80949099999998,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -16.27679999999964
+                "deltaMs": 1.3416919999999664
               },
               {
                 "pairIndex": 8,
@@ -2108,16 +2108,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 470.709299999995,
+                  "durationMs": 42.57934899999998,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 474.26640000000043,
+                  "durationMs": 43.867924000000016,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 3.5571000000054482
+                "deltaMs": 1.288575000000037
               },
               {
                 "pairIndex": 9,
@@ -2126,16 +2126,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 444.35280000000057,
+                  "durationMs": 40.85386100000005,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 440.4890000000014,
+                  "durationMs": 43.41219000000001,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -3.8637999999991735
+                "deltaMs": 2.558328999999958
               },
               {
                 "pairIndex": 10,
@@ -2144,16 +2144,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 417.6175000000003,
+                  "durationMs": 40.35137300000008,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 420.607600000003,
+                  "durationMs": 42.22785399999998,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 2.9901000000027125
+                "deltaMs": 1.8764809999998988
               },
               {
                 "pairIndex": 11,
@@ -2162,16 +2162,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 418.33320000000094,
+                  "durationMs": 41.93007700000021,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 423.79349999999977,
+                  "durationMs": 42.15366700000004,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 5.460299999998824
+                "deltaMs": 0.22358999999983098
               },
               {
                 "pairIndex": 12,
@@ -2180,16 +2180,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 420.86439999999857,
+                  "durationMs": 41.244020999999975,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 417.55019999999786,
+                  "durationMs": 41.39611100000002,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -3.31420000000071
+                "deltaMs": 0.1520900000000438
               },
               {
                 "pairIndex": 13,
@@ -2198,16 +2198,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 423.681399999994,
+                  "durationMs": 43.16132500000003,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 414.69869999999355,
+                  "durationMs": 42.36068299999988,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -8.982700000000477
+                "deltaMs": -0.8006420000001526
               },
               {
                 "pairIndex": 14,
@@ -2216,16 +2216,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 425.4317999999985,
+                  "durationMs": 40.466544999999996,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 427.00799999999435,
+                  "durationMs": 42.70448699999997,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 1.576199999995879
+                "deltaMs": 2.2379419999999755
               },
               {
                 "pairIndex": 15,
@@ -2234,16 +2234,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 419.3280999999988,
+                  "durationMs": 40.609702999999854,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 439.6316000000006,
+                  "durationMs": 42.816753999999946,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 20.303500000001804
+                "deltaMs": 2.2070510000000922
               },
               {
                 "pairIndex": 16,
@@ -2252,16 +2252,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 431.0077999999994,
+                  "durationMs": 41.48368499999992,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 424.4147000000012,
+                  "durationMs": 43.233375000000024,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -6.5930999999982305
+                "deltaMs": 1.7496900000001006
               },
               {
                 "pairIndex": 17,
@@ -2270,16 +2270,16 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 465.7436000000016,
+                  "durationMs": 43.53676199999995,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 441.74809999999707,
+                  "durationMs": 42.53614799999991,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -23.99550000000454
+                "deltaMs": -1.0006140000000414
               },
               {
                 "pairIndex": 18,
@@ -2288,16 +2288,16 @@
                   "freshread"
                 ],
                 "baseline": {
-                  "durationMs": 418.0873000000065,
+                  "durationMs": 43.733655,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 427.16689999999653,
+                  "durationMs": 44.67897500000004,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": 9.079599999990023
+                "deltaMs": 0.9453200000000379
               },
               {
                 "pairIndex": 19,
@@ -2306,23 +2306,23 @@
                   "baseline"
                 ],
                 "baseline": {
-                  "durationMs": 441.1469999999972,
+                  "durationMs": 40.397698999999875,
                   "status": 0,
                   "signal": null
                 },
                 "freshread": {
-                  "durationMs": 425.2534999999989,
+                  "durationMs": 43.11358100000007,
                   "status": 0,
                   "signal": null
                 },
-                "deltaMs": -15.893499999998312
+                "deltaMs": 2.7158820000001924
               }
             ],
             "required": true,
             "status": "RUN"
           },
           "populatedHookSpawn": {
-            "p95DeltaMs": 217.60989999999583,
+            "p95DeltaMs": 80.43674299999839,
             "p95BudgetMs": 900,
             "p95AbsoluteBudgetMs": 900,
             "p95DeltaBudgetMs": 400,
@@ -2334,17 +2334,17 @@
             "baseline": {
               "enabled": false,
               "iterations": 8,
-              "p50Ms": 432.5500000000029,
-              "p95Ms": 487.21360000000277,
-              "p99Ms": 487.21360000000277,
+              "p50Ms": 41.279310000001715,
+              "p95Ms": 43.179551000001084,
+              "p99Ms": 43.179551000001084,
               "failures": []
             },
             "freshread": {
               "enabled": true,
               "iterations": 8,
-              "p50Ms": 695.0090999999957,
-              "p95Ms": 704.8234999999986,
-              "p99Ms": 704.8234999999986,
+              "p50Ms": 121.87822599999708,
+              "p95Ms": 123.61629399999947,
+              "p99Ms": 123.61629399999947,
               "failures": []
             },
             "required": true,
@@ -2358,7 +2358,7 @@
         "passed": true,
         "evidence": {
           "algorithm": "SHA-256",
-          "digest": "769ff2c603e652282be5c4a09a3fac249ddd50e407d2c55bc96e4b9d74873ca8",
+          "digest": "0e6d4f96afe7fe1ced8d1afc26cac5f8e857b55acbdd203cafc9f26d71c41f0e",
           "fileCount": 30,
           "excludes": [
             "node_modules/**",

@@ -1,7 +1,7 @@
 # FreshRead release benchmark
 
-Source tree SHA-256: 769ff2c603e652282be5c4a09a3fac249ddd50e407d2c55bc96e4b9d74873ca8
-Generated: 2026-08-24T07:48:46.930Z
+Source tree SHA-256: 0e6d4f96afe7fe1ced8d1afc26cac5f8e857b55acbdd203cafc9f26d71c41f0e
+Generated: 2026-08-24T14:19:40.797Z
 Execution profile: full-release
 
 Status: **PASS** for deterministic + synthetic-handler + security + full local-performance.
@@ -35,17 +35,17 @@ Absolute latency and baseline-delta budgets are independent and must both pass.
 
 | Workload | Metadata-loop baseline p95 | FreshRead p95 | Absolute budget | Delta / budget | Gate |
 | --- | ---: | ---: | ---: | ---: | --- |
-| 100 unchanged files | 6.588 ms | 26.047 ms | 50.000 ms | 19.459 / 30.000 ms | PASS |
-| 1000 unchanged files | 67.147 ms | 237.581 ms | 400.000 ms | 170.434 / 300.000 ms | PASS |
-| Cold hook spawn (paired AB/BA) | 468.793 ms | 459.269 ms | 500.000 ms | 20.304 / 100.000 ms | PASS |
-| Populated 1000-file hook spawn | 487.214 ms | 704.823 ms | 900.000 ms | 217.610 / 400.000 ms | PASS |
+| 100 unchanged files | 0.757 ms | 6.832 ms | 50.000 ms | 6.074 / 30.000 ms | PASS |
+| 1000 unchanged files | 4.565 ms | 39.470 ms | 400.000 ms | 34.905 / 300.000 ms | PASS |
+| Cold hook spawn (paired AB/BA) | 43.537 ms | 45.293 ms | 500.000 ms | 3.587 / 100.000 ms | PASS |
+| Populated 1000-file hook spawn | 43.180 ms | 123.616 ms | 900.000 ms | 80.437 / 400.000 ms | PASS |
 
 ### Read-registration growth
 
 | Workload | Metadata-loop baseline | FreshRead | Absolute budget | Delta / budget | Gate |
 | --- | ---: | ---: | ---: | ---: | --- |
-| Exact 1000th read | 0.001 ms | 47.957 ms | 150.000 ms | 47.956 / 125.000 ms | PASS |
-| Near-1000th read p95 (10 reads) | 0.002 ms | 50.061 ms | 150.000 ms | 50.059 / 125.000 ms | PASS |
+| Exact 1000th read | 0.001 ms | 35.785 ms | 150.000 ms | 35.784 / 125.000 ms | PASS |
+| Near-1000th read p95 (10 reads) | 0.002 ms | 36.996 ms | 150.000 ms | 36.994 / 125.000 ms | PASS |
 | Read-phase logical path resolutions | 0 | 2999 | 3000 max | n/a | PASS |
 
 ## Launch gates
