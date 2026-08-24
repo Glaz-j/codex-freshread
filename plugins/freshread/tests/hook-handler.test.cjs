@@ -40,6 +40,46 @@ function fixture(t) {
   };
 }
 
+function aliasedHookFixture(t) {
+  const physicalParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-hook-physical-"));
+  const aliasParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-hook-alias-"));
+  const physicalRoot = path.join(physicalParent, "workspace");
+  const aliasRoot = path.join(aliasParent, "workspace-link");
+  const dataDir = path.join(physicalParent, ".plugin-data");
+  fs.mkdirSync(physicalRoot);
+  fs.symlinkSync(physicalRoot, aliasRoot, process.platform === "win32" ? "junction" : "dir");
+  const physicalTarget = path.join(physicalRoot, "src", "aliased.ts");
+  const aliasTarget = path.join(aliasRoot, "src", "aliased.ts");
+  fs.mkdirSync(path.dirname(physicalTarget), { recursive: true });
+  fs.writeFileSync(physicalTarget, "A\n");
+  t.after(() => {
+    try { fs.unlinkSync(aliasRoot); } catch {}
+    fs.rmSync(aliasParent, { recursive: true, force: true });
+    fs.rmSync(physicalParent, { recursive: true, force: true });
+  });
+  return {
+    aliasRoot,
+    aliasTarget,
+    dataDir,
+    physicalTarget,
+    base(name, extra = {}) {
+      return {
+        session_id: "aliased-hook-session",
+        turn_id: "turn-aliased",
+        cwd: aliasRoot,
+        hook_event_name: name,
+        model: "test-model",
+        permission_mode: "default",
+        ...extra,
+      };
+    },
+    options: { dataDir },
+    engine() {
+      return new FreshReadEngine({ cwd: aliasRoot, dataDir, sessionId: "aliased-hook-session" });
+    },
+  };
+}
+
 function runUpdatedShell(command, cwd) {
   if (process.platform === "win32") {
     const powershell = path.join(process.env.SystemRoot, "System32", "WindowsPowerShell", "v1.0", "powershell.exe");
@@ -90,6 +130,35 @@ test("observed Pre/PostToolUse read records only output that exactly matches the
   assert.equal(output.hookSpecificOutput.hookEventName, "UserPromptSubmit");
   assert.match(output.hookSpecificOutput.additionalContext, /STALE_EXTERNAL/);
   assert.match(output.hookSpecificOutput.additionalContext, /src[\\/]auth\.ts/);
+});
+
+test("hook read evidence and stale-edit guards work through an aliased workspace root", (t) => {
+  const fx = aliasedHookFixture(t);
+  const preRead = fx.base("PreToolUse", {
+    tool_name: "Bash",
+    tool_use_id: "aliased-hook-read",
+    tool_input: { command: canonicalReadCommand(fx.aliasTarget) },
+  });
+  assert.equal(handleHookEvent(preRead, fx.options), null);
+  const run = runUpdatedShell(preRead.tool_input.command, fx.aliasRoot);
+  assert.equal(run.status, 0, run.stderr);
+  const postRead = {
+    ...preRead,
+    hook_event_name: "PostToolUse",
+    tool_response: run.stdout,
+  };
+  assert.equal(handleHookEvent(postRead, fx.options), null);
+  assert.equal(fx.engine().inspect(fx.aliasTarget).state, STATES.FRESH);
+  assert.equal(fs.existsSync(fx.engine().statePath), true);
+
+  fs.writeFileSync(fx.physicalTarget, "B\n");
+  const blocked = handleHookEvent(fx.base("PreToolUse", {
+    tool_name: "apply_patch",
+    tool_use_id: "aliased-hook-write",
+    tool_input: { command: "*** Begin Patch\n*** Update File: src/aliased.ts\n*** End Patch" },
+  }), fx.options);
+  assert.equal(blocked.hookSpecificOutput.permissionDecision, "deny");
+  assert.match(blocked.hookSpecificOutput.permissionDecisionReason, /STALE_EXTERNAL/);
 });
 
 test("canonical Windows PowerShell carrier establishes a snapshot and blocks a later stale write", { skip: process.platform !== "win32" }, (t) => {

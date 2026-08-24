@@ -19,7 +19,7 @@ const {
   tokenizeShell,
 } = require("./command-analyzer.cjs");
 
-const EVIDENCE_SCHEMA_VERSION = 1;
+const EVIDENCE_SCHEMA_VERSION = 2;
 const DEFAULT_MAX_VERIFIED_READ_BYTES = 16 * 1024 * 1024;
 const MAX_EVIDENCE_FILE_BYTES = 1024 * 1024;
 const EVIDENCE_TTL_MS = 15 * 60 * 1000;
@@ -117,6 +117,61 @@ function readJsonRegular(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
 }
 
+function realWorkspaceRoot(cwd) {
+  const lexicalRoot = path.resolve(cwd);
+  const realRoot = path.normalize(fs.realpathSync.native(lexicalRoot));
+  if (!fs.statSync(realRoot).isDirectory()) throw new Error("workspace root is not a directory");
+  return realRoot;
+}
+
+function validatePendingWorkspace(pending, engine = null) {
+  if (!pending || typeof pending !== "object" || Array.isArray(pending)) {
+    throw new Error("tool evidence workspace is invalid");
+  }
+  if (typeof pending.cwd !== "string" || !pending.cwd || !path.isAbsolute(pending.cwd)) {
+    throw new Error("tool evidence cwd is invalid");
+  }
+  const lexicalRoot = path.resolve(pending.cwd);
+  if (pathKey(lexicalRoot) !== pathKey(path.normalize(pending.cwd))) {
+    throw new Error("tool evidence cwd is not canonical");
+  }
+  if (typeof pending.realCwd !== "string" || !pending.realCwd || !path.isAbsolute(pending.realCwd)) {
+    throw new Error("tool evidence real workspace root is invalid");
+  }
+  const persistedRealRoot = path.normalize(pending.realCwd);
+  const currentRealRoot = realWorkspaceRoot(lexicalRoot);
+  if (pathKey(currentRealRoot) !== pathKey(persistedRealRoot)) {
+    throw new Error("tool evidence workspace root changed identity");
+  }
+  if (typeof pending.allowOutsideWorkspace !== "boolean") {
+    throw new Error("tool evidence workspace policy is invalid");
+  }
+  if (!Number.isFinite(pending.maxFileBytes) || pending.maxFileBytes <= 0 ||
+      !Number.isFinite(pending.maxVerifiedReadBytes) || pending.maxVerifiedReadBytes <= 0) {
+    throw new Error("tool evidence safety limits are invalid");
+  }
+  if (!Array.isArray(pending.paths) || !pending.paths.length || pending.paths.some((item) => typeof item !== "string")) {
+    throw new Error("tool evidence paths are invalid");
+  }
+  for (const item of pending.paths) {
+    const canonical = canonicalPath(lexicalRoot, item);
+    if (!path.isAbsolute(item) || !canonical || pathKey(canonical) !== pathKey(path.normalize(item))) {
+      throw new Error("tool evidence path is not canonical");
+    }
+    if (!pending.allowOutsideWorkspace && !isWithin(lexicalRoot, canonical)) {
+      throw new Error("tool evidence path is outside the workspace scope");
+    }
+  }
+  if (engine) {
+    if (pathKey(lexicalRoot) !== pathKey(engine.cwd) ||
+        pathKey(persistedRealRoot) !== pathKey(engine.realCwd) ||
+        pending.allowOutsideWorkspace !== engine.allowOutsideWorkspace) {
+      throw new Error("tool evidence belongs to another workspace invocation");
+    }
+  }
+  return { lexicalRoot, realRoot: persistedRealRoot };
+}
+
 function normalizeCommandName(token) {
   return path.basename(String(token || "")).toLowerCase().replace(/\.(exe|cmd|bat|ps1|sh)$/i, "");
 }
@@ -152,7 +207,7 @@ function writeShellFlavor(event) {
   return null;
 }
 
-function resolveExactReadPath(baseDir, scopeRoot, value) {
+function resolveExactReadPath(baseDir, scopeRoot, realScopeRoot, value) {
   const cleaned = String(value || "").trim().replace(/^[,]+|[,]$/g, "");
   if (hasDynamicSyntax(cleaned) || cleaned === "-") return null;
   const candidate = canonicalPath(baseDir, cleaned);
@@ -160,7 +215,7 @@ function resolveExactReadPath(baseDir, scopeRoot, value) {
   try {
     if (!fs.statSync(candidate).isFile()) return null;
     const realPath = fs.realpathSync.native(candidate);
-    if (!isWithin(scopeRoot, realPath)) return null;
+    if (!isWithin(realScopeRoot, realPath)) return null;
   } catch {
     return null;
   }
@@ -214,6 +269,12 @@ function exactObservedReadPlan(event) {
   if (["gc", "get-content"].includes(name) && (!rawMode || !utf8Encoding)) return null;
 
   const scopeRoot = path.resolve(event.cwd || process.cwd());
+  let realScopeRoot;
+  try {
+    realScopeRoot = realWorkspaceRoot(scopeRoot);
+  } catch {
+    return null;
+  }
   const baseDir = eventWorkingDirectory(event, scopeRoot);
   const input = event && event.tool_input;
   const hasExplicitToolCwd = Boolean(
@@ -221,7 +282,7 @@ function exactObservedReadPlan(event) {
     ((typeof input.workdir === "string" && input.workdir) || (typeof input.cwd === "string" && input.cwd))
   );
   if (!hasExplicitToolCwd && rawPaths.some((item) => !isFullyQualifiedPath(String(item).trim()))) return null;
-  const resolved = rawPaths.map((item) => resolveExactReadPath(baseDir, scopeRoot, item));
+  const resolved = rawPaths.map((item) => resolveExactReadPath(baseDir, scopeRoot, realScopeRoot, item));
   if (resolved.some((item) => !item)) return null;
   return {
     command: source,
@@ -229,6 +290,7 @@ function exactObservedReadPlan(event) {
     paths: resolved,
     cwd: baseDir,
     scopeRoot,
+    realScopeRoot,
     renderMode: ["gc", "get-content"].includes(name) ? "powershell-utf8-raw" : "raw-bytes",
   };
 }
@@ -256,6 +318,7 @@ function preparePending(engine, event, kind, paths, extra = {}) {
     toolUseId: event.tool_use_id,
     sessionId: engine.sessionId,
     cwd: engine.cwd,
+    realCwd: engine.realCwd,
     allowOutsideWorkspace: engine.allowOutsideWorkspace,
     maxFileBytes: engine.maxFileBytes,
     maxVerifiedReadBytes: finitePositive(
@@ -266,6 +329,7 @@ function preparePending(engine, event, kind, paths, extra = {}) {
     resultPath: locations.resultPath,
     ...extra,
   };
+  validatePendingWorkspace(pending, engine);
   writeJsonAtomic(locations.pendingPath, pending);
   return { ...locations, pending };
 }
@@ -376,7 +440,7 @@ function prepareShellOutcome(engine, event, writePaths) {
 function validMetadata(value) {
   return Boolean(
     value && typeof value === "object" && !Array.isArray(value) &&
-    typeof value.realPath === "string" && value.realPath &&
+    typeof value.realPath === "string" && value.realPath && path.isAbsolute(value.realPath) &&
     Number.isSafeInteger(value.size) && value.size >= 0 &&
     ["mtimeNs", "ctimeNs", "dev", "ino"].every((key) => typeof value[key] === "string" && /^\d+$/.test(value[key]))
   );
@@ -404,9 +468,7 @@ function consumeToolEvidence(engine, event) {
     if (!Number.isFinite(Date.parse(pending.createdAt)) || Date.now() - Date.parse(pending.createdAt) > EVIDENCE_TTL_MS) {
       throw new Error("tool evidence expired");
     }
-    if (!Array.isArray(pending.paths) || !pending.paths.length || pending.paths.some((item) => typeof item !== "string")) {
-      throw new Error("tool evidence paths are invalid");
-    }
+    const workspace = validatePendingWorkspace(pending, engine);
     if (pathKey(pending.resultPath) !== pathKey(locations.resultPath)) throw new Error("tool evidence result path is invalid");
 
     if (pending.kind === "observed-read") {
@@ -428,7 +490,8 @@ function consumeToolEvidence(engine, event) {
       }
       const expected = new Set(pending.paths.map(pathKey));
       for (const item of evidence.entries) {
-        if (!item || !expected.has(pathKey(item.path || "")) || !HASH_PATTERN.test(item.hash || "") || !validMetadata(item.metadata)) {
+        if (!item || !expected.has(pathKey(item.path || "")) || !HASH_PATTERN.test(item.hash || "") || !validMetadata(item.metadata) ||
+            (!pending.allowOutsideWorkspace && !isWithin(workspace.realRoot, path.normalize(item.metadata.realPath)))) {
           throw new Error("verified read result entry is invalid");
         }
       }
@@ -465,12 +528,13 @@ function metadataFromStat(stat, realPath) {
 }
 
 function stableRead(filePath, pending, remainingBytes) {
-  const canonical = canonicalPath(pending.cwd, filePath);
-  if (!canonical || (!pending.allowOutsideWorkspace && !isWithin(pending.cwd, canonical))) {
+  const workspace = validatePendingWorkspace(pending);
+  const canonical = canonicalPath(workspace.lexicalRoot, filePath);
+  if (!canonical || (!pending.allowOutsideWorkspace && !isWithin(workspace.lexicalRoot, canonical))) {
     throw new Error("verified read path is outside the workspace scope");
   }
   const readPath = fs.realpathSync.native(canonical);
-  if (!pending.allowOutsideWorkspace && !isWithin(pending.cwd, readPath)) {
+  if (!pending.allowOutsideWorkspace && !isWithin(workspace.realRoot, readPath)) {
     throw new Error("verified read symlink target is outside the workspace scope");
   }
   const descriptor = fs.openSync(readPath, "r");
@@ -481,7 +545,7 @@ function stableRead(filePath, pending, remainingBytes) {
     if (Number(before.size) > remainingBytes) throw new Error("verified read output exceeds its aggregate safety limit");
 
     const currentRealPath = fs.realpathSync.native(readPath);
-    if (!pending.allowOutsideWorkspace && !isWithin(pending.cwd, currentRealPath)) {
+    if (!pending.allowOutsideWorkspace && !isWithin(workspace.realRoot, currentRealPath)) {
       throw new Error("verified read target escaped the workspace scope");
     }
     const pathBefore = fs.statSync(readPath, { bigint: true });
@@ -576,6 +640,7 @@ function loadPendingForReader(pendingPath) {
   if (!/^[a-f0-9]{64}$/.test(pending.token || "") || !Array.isArray(pending.paths) || !pending.paths.length) {
     throw new Error("reader pending evidence is invalid");
   }
+  validatePendingWorkspace(pending);
   const directory = path.dirname(absolute);
   if (pathKey(path.dirname(path.resolve(pending.resultPath))) !== pathKey(directory)) {
     throw new Error("reader result path escapes its evidence directory");

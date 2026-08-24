@@ -87,6 +87,55 @@ test("realpath identity bridges a directory alias and its real file path", (t) =
   assert.equal(aliasGuard.files[0].state, STATES.STALE_SELF);
 });
 
+test("an aliased workspace root keeps lexical requests and real targets in separate containment domains", (t) => {
+  const physicalParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-root-physical-"));
+  const aliasParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-root-alias-"));
+  const physicalRoot = path.join(physicalParent, "workspace");
+  const aliasRoot = path.join(aliasParent, "workspace-link");
+  const outside = path.join(physicalParent, "outside");
+  const escapeAlias = path.join(aliasRoot, "escape-link");
+  fs.mkdirSync(physicalRoot);
+  fs.mkdirSync(outside);
+  linkDirectory(physicalRoot, aliasRoot);
+  t.after(() => {
+    try { unlinkDirectory(escapeAlias); } catch {}
+    try { unlinkDirectory(aliasRoot); } catch {}
+    fs.rmSync(aliasParent, { recursive: true, force: true });
+    fs.rmSync(physicalParent, { recursive: true, force: true });
+  });
+
+  const physicalFile = path.join(physicalRoot, "src", "aliased.ts");
+  const aliasFile = path.join(aliasRoot, "src", "aliased.ts");
+  fs.mkdirSync(path.dirname(physicalFile), { recursive: true });
+  fs.writeFileSync(physicalFile, "A\n");
+  const engine = new FreshReadEngine({
+    cwd: aliasRoot,
+    dataDir: path.join(physicalParent, ".state"),
+    sessionId: "aliased-root-session",
+  });
+
+  assert.equal(pathKey(engine.cwd), pathKey(aliasRoot));
+  assert.equal(pathKey(engine.realCwd), pathKey(fs.realpathSync.native(physicalRoot)));
+  assert.equal(engine.recordRead(aliasFile).state, STATES.FRESH);
+  const persisted = JSON.parse(fs.readFileSync(engine.statePath, "utf8"));
+  assert.ok(persisted.files[pathKey(fs.realpathSync.native(physicalFile))]);
+
+  fs.writeFileSync(physicalFile, "B\n");
+  const aliasedGuard = engine.guardEdit([aliasFile]);
+  assert.equal(aliasedGuard.blocked, true);
+  assert.equal(aliasedGuard.files[0].state, STATES.STALE_EXTERNAL);
+
+  const physicalSpelling = engine.guardEdit([physicalFile]);
+  assert.equal(physicalSpelling.blocked, true);
+  assert.equal(physicalSpelling.files[0].state, STATES.UNKNOWN);
+  assert.match(physicalSpelling.files[0].detail, /outside the workspace scope/i);
+
+  linkDirectory(outside, escapeAlias);
+  const escapedMissing = engine.guardEdit([path.join(escapeAlias, "new.ts")]);
+  assert.equal(escapedMissing.blocked, true);
+  assert.match(escapedMissing.files[0].detail, /outside the workspace scope/i);
+});
+
 test("legacy alias-keyed state migrates and guards writes through the real path", (t) => {
   const fx = fixture(t);
   const realFile = fx.file("actual/config.ts", "A\n");

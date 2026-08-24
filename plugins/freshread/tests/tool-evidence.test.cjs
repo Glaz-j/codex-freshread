@@ -48,6 +48,51 @@ function fixture(t) {
   };
 }
 
+function aliasedWorkspaceFixture(t) {
+  const physicalParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-evidence-physical-"));
+  const aliasParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-evidence-alias-"));
+  const physicalRoot = path.join(physicalParent, "workspace");
+  const outsideRoot = path.join(physicalParent, "outside");
+  const aliasRoot = path.join(aliasParent, "workspace-link");
+  fs.mkdirSync(physicalRoot);
+  fs.mkdirSync(outsideRoot);
+  fs.symlinkSync(physicalRoot, aliasRoot, process.platform === "win32" ? "junction" : "dir");
+  const physicalTarget = path.join(physicalRoot, "src", "aliased.ts");
+  const aliasTarget = path.join(aliasRoot, "src", "aliased.ts");
+  fs.mkdirSync(path.dirname(physicalTarget), { recursive: true });
+  fs.writeFileSync(physicalTarget, "aliased\n");
+  const dataDir = path.join(physicalParent, ".plugin-data");
+  const engine = new FreshReadEngine({ cwd: aliasRoot, dataDir, sessionId: "aliased-evidence-session" });
+  t.after(() => {
+    try { fs.unlinkSync(aliasRoot); } catch {}
+    fs.rmSync(aliasParent, { recursive: true, force: true });
+    fs.rmSync(physicalParent, { recursive: true, force: true });
+  });
+  return {
+    aliasRoot,
+    aliasTarget,
+    dataDir,
+    engine,
+    outsideRoot,
+    physicalRoot,
+    physicalTarget,
+    event(id) {
+      return {
+        cwd: aliasRoot,
+        session_id: "aliased-evidence-session",
+        hook_event_name: "PreToolUse",
+        tool_name: "Bash",
+        tool_use_id: id,
+        tool_input: {
+          command: canonicalReadCommand("src/aliased.ts"),
+          workdir: aliasRoot,
+          shell: process.platform === "win32" ? "powershell" : "sh",
+        },
+      };
+    },
+  };
+}
+
 function quoteShellLiteral(value) {
   const text = String(value);
   return process.platform === "win32"
@@ -129,6 +174,41 @@ test("trusted reader evidence binds the bytes written to stdout to a stable SHA-
   assert.match(evidence.entries[0].hash, /^[a-f0-9]{64}$/);
   assert.equal(fs.existsSync(prepared.pendingPath), false);
   assert.equal(fs.existsSync(prepared.resultPath), false);
+});
+
+test("verified evidence persists and validates the physical root of an aliased workspace", (t) => {
+  const fx = aliasedWorkspaceFixture(t);
+  const event = fx.event("aliased-verified-read");
+  const prepared = prepareVerifiedRead(fx.engine, event);
+  assert.ok(prepared);
+  assert.deepEqual(prepared.plan.paths, [fx.aliasTarget]);
+  const pending = JSON.parse(fs.readFileSync(prepared.pendingPath, "utf8"));
+  assert.equal(path.resolve(pending.cwd), path.resolve(fx.aliasRoot));
+  assert.equal(path.resolve(pending.realCwd), path.resolve(fs.realpathSync.native(fx.physicalRoot)));
+
+  const script = path.resolve(__dirname, "..", "scripts", "freshread-read.cjs");
+  const run = spawnSync(process.execPath, [script, prepared.pendingPath], { encoding: "utf8" });
+  assert.equal(run.status, 0, run.stderr);
+  assert.equal(run.stdout, "aliased\n");
+  const evidence = consumeToolEvidence(fx.engine, event);
+  assert.equal(evidence.success, true);
+  assert.equal(fx.engine.recordVerifiedRead(evidence.entries[0]).state, "FRESH");
+  assert.equal(fs.existsSync(fx.engine.statePath), true);
+});
+
+test("verified reader fails closed when an aliased workspace root is retargeted", (t) => {
+  const fx = aliasedWorkspaceFixture(t);
+  const event = fx.event("retargeted-workspace-root");
+  const prepared = prepareVerifiedRead(fx.engine, event);
+  assert.ok(prepared);
+
+  fs.unlinkSync(fx.aliasRoot);
+  fs.symlinkSync(fx.outsideRoot, fx.aliasRoot, process.platform === "win32" ? "junction" : "dir");
+  const script = path.resolve(__dirname, "..", "scripts", "freshread-read.cjs");
+  const run = spawnSync(process.execPath, [script, prepared.pendingPath], { encoding: "utf8" });
+  assert.notEqual(run.status, 0);
+  assert.equal(run.stdout, "");
+  assert.match(run.stderr, /workspace root changed identity/i);
 });
 
 test("observed reads record only canonical raw output that exactly matches current file bytes", (t) => {

@@ -146,6 +146,8 @@ class FreshReadEngine {
     if (!options.dataDir) throw new Error("FreshReadEngine requires dataDir");
     if (!options.sessionId) throw new Error("FreshReadEngine requires sessionId");
     this.cwd = path.resolve(options.cwd);
+    this.realCwd = path.normalize(fs.realpathSync.native(this.cwd));
+    if (!fs.statSync(this.realCwd).isDirectory()) throw new Error("FreshReadEngine cwd must be a directory");
     this.dataDir = path.resolve(options.dataDir);
     this.sessionId = String(options.sessionId);
     this.enabled = options.enabled !== false;
@@ -184,16 +186,24 @@ class FreshReadEngine {
     };
   }
 
-  _validateStoredPath(value, label) {
+  _validateContainedPath(value, label, root) {
     if (typeof value !== "string" || !value || !path.isAbsolute(value)) return `${label} is not an absolute path`;
     const normalized = path.normalize(value);
-    if (!this.allowOutsideWorkspace && !isWithin(this.cwd, normalized)) return `${label} is outside the workspace scope`;
+    if (!this.allowOutsideWorkspace && !isWithin(root, normalized)) return `${label} is outside the workspace scope`;
     return null;
+  }
+
+  _validateLexicalPath(value, label) {
+    return this._validateContainedPath(value, label, this.cwd);
+  }
+
+  _validateRealPath(value, label) {
+    return this._validateContainedPath(value, label, this.realCwd);
   }
 
   _validateMetadata(value, label) {
     if (!isObject(value)) return `${label} is not an object`;
-    const pathError = this._validateStoredPath(value.realPath, `${label}.realPath`);
+    const pathError = this._validateRealPath(value.realPath, `${label}.realPath`);
     if (pathError) return pathError;
     if (!Number.isSafeInteger(value.size) || value.size < 0) return `${label}.size is invalid`;
     for (const field of ["mtimeNs", "ctimeNs", "dev", "ino"]) {
@@ -241,7 +251,7 @@ class FreshReadEngine {
 
   _validateRecord(value, label) {
     if (!isObject(value)) return `${label} is not an object`;
-    const pathError = this._validateStoredPath(value.path, `${label}.path`);
+    const pathError = this._validateLexicalPath(value.path, `${label}.path`);
     if (pathError) return pathError;
     if (typeof value.displayPath !== "string") return `${label}.displayPath is invalid`;
     const snapshotError = this._validateSnapshot(value.snapshot, `${label}.snapshot`);
@@ -252,7 +262,7 @@ class FreshReadEngine {
     if (lastSelfError) return lastSelfError;
     if (typeof value.externalSinceRead !== "boolean") return `${label}.externalSinceRead is invalid`;
     if (value.identityPath !== undefined) {
-      const identityError = this._validateStoredPath(value.identityPath, `${label}.identityPath`);
+      const identityError = this._validateRealPath(value.identityPath, `${label}.identityPath`);
       if (identityError) return identityError;
       if (pathKey(value.identityPath) !== pathKey(value.snapshot.metadata.realPath)) {
         return `${label}.identityPath does not match its snapshot identity`;
@@ -623,7 +633,7 @@ class FreshReadEngine {
         throw error;
       }
       const realPath = fs.realpathSync.native(canonical);
-      if (!this.allowOutsideWorkspace && !isWithin(this.cwd, realPath)) {
+      if (!this.allowOutsideWorkspace && !isWithin(this.realCwd, realPath)) {
         return { kind: "error", path: canonical, detail: "symlink target is outside the workspace scope" };
       }
       if (entry.isSymbolicLink()) entry = fs.statSync(canonical, { bigint: true });
@@ -660,7 +670,7 @@ class FreshReadEngine {
         if (!entry.isDirectory()) {
           return { kind: "error", path: canonical, detail: "missing path has a non-directory ancestor" };
         }
-        if (!this.allowOutsideWorkspace && !isWithin(this.cwd, realPath)) {
+        if (!this.allowOutsideWorkspace && !isWithin(this.realCwd, realPath)) {
           return { kind: "error", path: canonical, detail: "missing path resolves through an ancestor outside the workspace scope" };
         }
         return { kind: "missing", path: canonical, ancestorRealPath: realPath };
