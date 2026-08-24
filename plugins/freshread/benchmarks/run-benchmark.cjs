@@ -241,6 +241,17 @@ function writeFile(root, relativePath, content) {
   return target;
 }
 
+// Fixture determinism only: these synthetic scenarios intentionally exercise a
+// metadata-observable external edit within the V0 lifecycle-scan contract.
+// Advance mtime so coarse host timestamp ticks cannot hide the synthetic edit.
+function writeObservableExternalMutation(target, content, previousStat) {
+  const before = previousStat || fs.statSync(target);
+  fs.writeFileSync(target, content);
+  const observableTime = new Date(Math.max(Date.now(), before.mtimeMs) + 2000);
+  fs.utimesSync(target, observableTime, observableTime);
+  return target;
+}
+
 function makeOptions(root, dataDir, sessionId, enabled) {
   return {
     cwd: root,
@@ -366,8 +377,10 @@ function runScenario(adapterFactory, scenario) {
         : null;
       switch (op) {
         case "seed":
-        case "externalWrite":
           writeFile(tempRoot, relativePath, value);
+          break;
+        case "externalWrite":
+          writeObservableExternalMutation(target, value);
           break;
         case "externalDelete":
           fs.unlinkSync(target);
@@ -510,7 +523,7 @@ function runOutcomeWorkflow(adapterFactory, armName) {
   try {
     const remembered = fs.readFileSync(target, "utf8");
     adapter.recordRead(target, { toolName: "outcome-workflow" });
-    fs.writeFileSync(
+    writeObservableExternalMutation(
       target,
       "// BASE_VERSION=B\n" + userMarker + "\nexport const role = 'root';\n"
     );
@@ -563,7 +576,7 @@ function runCoreGuardCase(adapterFactory, armName, kind) {
     const second = writeFile(tempRoot, "src/second.ts", "A\n");
     adapter.recordRead(first, { toolName: "guard-matrix" });
     if (kind === "missing") fs.unlinkSync(first);
-    else fs.writeFileSync(first, "B\n");
+    else writeObservableExternalMutation(first, "B\n");
     if (kind === "multi-target") adapter.recordRead(second, { toolName: "guard-matrix" });
     const targets = kind === "multi-target" ? [first, second] : [first];
     const result = adapter.guardEdit(targets);
@@ -590,7 +603,7 @@ function runHandlerGuardCase(modules, adapterFactory, armName, kind) {
     const source = writeFile(tempRoot, "src/source.ts", "source\n");
     const destination = writeFile(tempRoot, "src/destination.ts", "A\n");
     adapter.recordRead(destination, { toolName: "guard-matrix" });
-    fs.writeFileSync(destination, "B\n");
+    writeObservableExternalMutation(destination, "B\n");
     let event;
     if (kind === "apply-patch") {
       event = makeHookEvent(tempRoot, sessionId, "PreToolUse", {
@@ -659,7 +672,7 @@ function runHandlerProtocolMatrix(modules) {
     try {
       const engine = new modules.FreshReadEngine(makeOptions(tempRoot, dataDir, sessionId, true));
       engine.recordRead(target, { toolName: "handler-signal" });
-      if (expectedState === "STALE_EXTERNAL") fs.writeFileSync(target, "B\n");
+      if (expectedState === "STALE_EXTERNAL") writeObservableExternalMutation(target, "B\n");
       const event = makeHookEvent(tempRoot, sessionId, eventName, payload);
       const output = modules.handleHookEvent(event, { dataDir });
       const text = output ? JSON.stringify(output) : "";
@@ -804,7 +817,7 @@ function runSecurityMatrix(modules) {
       });
       const preOutput = modules.handleHookEvent(preEvent, { dataDir });
       const execution = runUpdatedShell(preEvent.tool_input.command, tempRoot);
-      if (execution.status === 0) fs.writeFileSync(target, "B\n");
+      if (execution.status === 0) writeObservableExternalMutation(target, "B\n");
       const warning = execution.status === 0
         ? modules.handleHookEvent(makeHookEvent(tempRoot, sessionId, "PostToolUse", {
             tool_name: "Bash",

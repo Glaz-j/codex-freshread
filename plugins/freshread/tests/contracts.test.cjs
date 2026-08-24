@@ -93,6 +93,17 @@ function fixture() {
   };
 }
 
+// Fixture determinism only: these synthetic scenarios intentionally exercise a
+// metadata-observable external edit within the V0 lifecycle-scan contract.
+// Advance mtime so coarse host timestamp ticks cannot hide the synthetic edit.
+function writeObservableExternalMutation(target, content) {
+  const before = fs.statSync(target);
+  fs.writeFileSync(target, content);
+  const observableTime = new Date(Math.max(Date.now(), before.mtimeMs) + 2000);
+  fs.utimesSync(target, observableTime, observableTime);
+  return target;
+}
+
 function launcherFixture(t) {
   const workspace = fs.mkdtempSync(path.join(launcherTempBase(), "freshread-launcher-"));
   const attackerBin = path.join(workspace, "bin");
@@ -911,7 +922,7 @@ test("self change followed by external change escalates to STALE_EXTERNAL", (t) 
   fs.writeFileSync(target, "B\n");
   engine.recordSelfWrite(target);
   assert.equal(engine.inspect(target).state, STATES.STALE_SELF);
-  fs.writeFileSync(target, "C\n");
+  writeObservableExternalMutation(target, "C\n");
   assert.equal(engine.inspect(target).state, STATES.STALE_EXTERNAL);
 });
 

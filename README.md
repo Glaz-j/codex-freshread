@@ -264,6 +264,10 @@ Deliberately not treated as reliable snapshots:
   non-regular files, and files larger than 256 MiB by default;
 - changes that race between the synchronous pre-edit check and the actual
   write;
+- lifecycle warnings can miss a change that preserves the complete metadata
+  tuple, including a rapid same-size write on a filesystem with coarse or cached
+  timestamps; supported pre-edit checks still force SHA-256 before allowing the
+  edit;
 - relative observed reads when the hook payload omits tool-level `workdir` or
   `cwd`; use a fully qualified path in that situation, while recognized relative
   shell writes fail closed;

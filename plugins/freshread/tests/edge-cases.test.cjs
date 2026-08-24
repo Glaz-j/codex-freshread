@@ -40,6 +40,17 @@ function runWorker(args) {
   });
 }
 
+// Fixture determinism only: these synthetic scenarios intentionally exercise a
+// metadata-observable external edit within the V0 lifecycle-scan contract.
+// Advance mtime so coarse host timestamp ticks cannot hide the synthetic edit.
+function writeObservableExternalMutation(target, content, previousStat) {
+  const before = previousStat || fs.statSync(target);
+  fs.writeFileSync(target, content);
+  const observableTime = new Date(Math.max(Date.now(), before.mtimeMs) + 2000);
+  fs.utimesSync(target, observableTime, observableTime);
+  return target;
+}
+
 test("concurrent hook processes do not lose snapshots or corrupt state", async (t) => {
   const fx = fixture(t);
   const files = Array.from({ length: 32 }, (_, index) => fx.file(`src/file-${index}.ts`, `export const n = ${index};\n`));
@@ -57,7 +68,7 @@ test("the same path can be stale-self in one session and stale-external in anoth
   const second = fx.engine("session-two");
   first.recordRead(target);
   second.recordRead(target);
-  fs.writeFileSync(target, "B\n");
+  writeObservableExternalMutation(target, "B\n");
   first.recordSelfWrite(target);
   assert.equal(first.inspect(target).state, STATES.STALE_SELF);
   assert.equal(second.inspect(target).state, STATES.STALE_EXTERNAL);
@@ -68,11 +79,12 @@ test("content identity wins for delete/recreate and restored content", (t) => {
   const target = fx.file("src/auth.ts", "AAAA\n");
   const engine = fx.engine();
   engine.recordRead(target);
+  const original = fs.statSync(target);
   fs.unlinkSync(target);
   assert.equal(engine.inspect(target).state, STATES.MISSING);
-  fs.writeFileSync(target, "BBBB\n");
+  writeObservableExternalMutation(target, "BBBB\n", original);
   assert.equal(engine.inspect(target).state, STATES.STALE_EXTERNAL);
-  fs.writeFileSync(target, "AAAA\n");
+  writeObservableExternalMutation(target, "AAAA\n");
   assert.equal(engine.inspect(target).state, STATES.FRESH);
 });
 

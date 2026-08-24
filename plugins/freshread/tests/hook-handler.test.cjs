@@ -40,6 +40,17 @@ function fixture(t) {
   };
 }
 
+// Fixture determinism only: these synthetic scenarios intentionally exercise a
+// metadata-observable external edit within the V0 lifecycle-scan contract.
+// Advance mtime so coarse host timestamp ticks cannot hide the synthetic edit.
+function writeObservableExternalMutation(target, content) {
+  const before = fs.statSync(target);
+  fs.writeFileSync(target, content);
+  const observableTime = new Date(Math.max(Date.now(), before.mtimeMs) + 2000);
+  fs.utimesSync(target, observableTime, observableTime);
+  return target;
+}
+
 function aliasedHookFixture(t) {
   const physicalParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-hook-physical-"));
   const aliasParent = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-hook-alias-"));
@@ -125,7 +136,7 @@ test("observed Pre/PostToolUse read records only output that exactly matches the
   assert.equal(handleHookEvent(postEvent, fx.options), null);
   assert.equal(fx.engine().inspect(fx.target).state, STATES.FRESH);
 
-  fs.writeFileSync(fx.target, "B\n");
+  writeObservableExternalMutation(fx.target, "B\n");
   const output = handleHookEvent(fx.base("UserPromptSubmit", { prompt: "continue" }), fx.options);
   assert.equal(output.hookSpecificOutput.hookEventName, "UserPromptSubmit");
   assert.match(output.hookSpecificOutput.additionalContext, /STALE_EXTERNAL/);
@@ -293,7 +304,7 @@ test("successful self edit is STALE_SELF; failed edit is not self-attributed", (
   assert.equal(fx.engine().inspect(fx.target).state, STATES.STALE_SELF);
 
   fx.engine().recordRead(fx.target);
-  fs.writeFileSync(fx.target, "C\n");
+  writeObservableExternalMutation(fx.target, "C\n");
   post.tool_response = { exit_code: 1, output: "failed" };
   assert.equal(handleHookEvent(post, fx.options), null);
   assert.equal(fx.engine().inspect(fx.target).state, STATES.STALE_EXTERNAL);

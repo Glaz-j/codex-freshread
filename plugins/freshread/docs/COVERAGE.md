@@ -66,8 +66,10 @@ original command still runs but the read remains untracked.
 
 The metadata fast path compares size, nanosecond mtime/ctime, device, inode, and
 resolved path before reusing a prior hash. A changed candidate is streamed through
-SHA-256 and checked again after hashing. Deliberate metadata forgery that preserves
-all compared fields is outside V0's threat model; pre-edit checks force a hash.
+SHA-256 and checked again after hashing. Any change that preserves every compared
+field is outside V0's lifecycle-scan threat model. This can include a rapid,
+same-size write on a filesystem with coarse or cached timestamps, as well as
+deliberate metadata forgery. Supported pre-edit checks still force a hash.
 
 State is keyed by read-time resolved identity while retaining the lexical path.
 Guards resolve both aliases and real paths and expand literal directory targets
