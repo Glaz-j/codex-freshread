@@ -11,7 +11,11 @@ for public releases.
 
 ## [Unreleased]
 
-No user-visible changes yet.
+### Fixed
+
+- Release asset publication now uses GitHub's dedicated upload endpoint and a
+  tag-bound manual recovery workflow, while new releases remain drafts until
+  all verified assets are present.
 
 ## [0.1.0] - 2026-08-24
 

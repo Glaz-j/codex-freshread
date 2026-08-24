@@ -4,12 +4,22 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing vX.Y.Z tag to validate and publish"
+        required: true
+        type: string
+
+env:
+  RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+  RELEASE_REF: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -41,6 +51,8 @@ jobs:
     steps:
       - name: Check out tagged source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_REF }}
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -59,6 +71,8 @@ jobs:
     steps:
       - name: Check out tagged source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_REF }}
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -76,6 +90,8 @@ jobs:
     steps:
       - name: Check out tagged source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_REF }}
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -98,23 +114,26 @@ jobs:
       - name: Check out tagged source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ env.RELEASE_REF }}
           fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: "20"
-      - name: Capture reproducible source timestamp
-        run: echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct "$GITHUB_SHA")" >> "$GITHUB_ENV"
+      - name: Capture reproducible release identity
+        run: |
+          echo "RELEASE_COMMIT=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)" >> "$GITHUB_ENV"
       - name: Build release ZIP, checksums, and manifest
-        run: node tools/package-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --tag "$GITHUB_REF_NAME" --commit "$GITHUB_SHA" --out-dir dist
+        run: node tools/package-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --tag "$RELEASE_TAG" --commit "$RELEASE_COMMIT" --out-dir dist
       - name: Validate final release ZIP
-        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --zip "dist/freshread-$GITHUB_REF_NAME.zip"
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --zip "dist/freshread-$RELEASE_TAG.zip"
       - name: Upload verified release assets
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: freshread-${{ github.ref_name }}-release-assets
+          name: freshread-${{ env.RELEASE_TAG }}-release-assets
           path: |
-            dist/freshread-${{ github.ref_name }}.zip
+            dist/freshread-${{ env.RELEASE_TAG }}.zip
             dist/SHA256SUMS
             dist/release-manifest.json
             dist/release-notes.md
@@ -132,6 +151,8 @@ jobs:
     steps:
       - name: Check out tagged source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ env.RELEASE_REF }}
       - name: Set up Node.js
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -139,14 +160,12 @@ jobs:
       - name: Download verified release assets
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          name: freshread-${{ github.ref_name }}-release-assets
+          name: freshread-${{ env.RELEASE_TAG }}-release-assets
           path: dist
       - name: Revalidate downloaded release assets
-        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --require-release-evidence --zip "dist/freshread-$GITHUB_REF_NAME.zip"
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --require-release-evidence --zip "dist/freshread-$RELEASE_TAG.zip"
       - name: Create release or refresh its assets
         uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
-        env:
-          RELEASE_TAG: ${{ github.ref_name }}
         with:
           github-token: ${{ github.token }}
           script: |
@@ -169,7 +188,8 @@ jobs:
                 tag_name: tag,
                 name: `FreshRead ${tag}`,
                 body: releaseBody,
-                draft: false,
+                // Keep a new release private until every verified asset exists.
+                draft: true,
                 prerelease: false,
               })).data;
             }
@@ -177,7 +197,6 @@ jobs:
             if (
               release.body !== releaseBody ||
               release.name !== `FreshRead ${tag}` ||
-              release.draft !== false ||
               release.prerelease !== false
             ) {
               release = (await github.rest.repos.updateRelease({
@@ -186,7 +205,6 @@ jobs:
                 release_id: release.id,
                 name: `FreshRead ${tag}`,
                 body: releaseBody,
-                draft: false,
                 prerelease: false,
               })).data;
             }
@@ -213,7 +231,7 @@ jobs:
                 });
               }
               const data = fs.readFileSync(asset.file);
-              await github.request("POST /repos/{owner}/{repo}/releases/{release_id}/assets", {
+              await github.rest.repos.uploadReleaseAsset({
                 owner,
                 repo,
                 release_id: release.id,
@@ -223,5 +241,17 @@ jobs:
                   "content-length": data.length,
                 },
                 data,
+              });
+            }
+
+            if (release.draft !== false || release.prerelease !== false) {
+              await github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: release.id,
+                name: `FreshRead ${tag}`,
+                body: releaseBody,
+                draft: false,
+                prerelease: false,
               });
             }

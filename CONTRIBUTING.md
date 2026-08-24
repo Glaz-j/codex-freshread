@@ -170,6 +170,12 @@ Only maintainers publish releases. A release candidate must have:
 - a reproducible plugin archive and published SHA-256 checksum; and
 - release notes that state supported platforms and known limitations.
 
+Publish from an immutable annotated `vX.Y.Z` tag. If asset publication fails
+after the tagged source and package have passed, fix the workflow on `main` and
+use **Actions → Release → Run workflow** with that existing tag. The recovery
+path checks out and revalidates the tag; never move or overwrite a published
+release tag to pick up a workflow fix.
+
 See [CHANGELOG.md](CHANGELOG.md) for the public history.
 
 ## Getting help

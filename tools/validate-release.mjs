@@ -62,6 +62,7 @@ if (await exists(path.join(repoRoot, "README.zh-CN.md"))) {
   if (!chinese.includes("README.md")) errors.push("README.zh-CN.md must link to README.md");
 }
 await validateLicenseParity();
+await validateReleaseWorkflowContract();
 
 for (const requiredPath of [
   "hooks/hooks.json",
@@ -115,6 +116,45 @@ async function validateLicenseParity() {
     if (!rootLicense.equals(pluginLicense)) errors.push("Root LICENSE and plugins/freshread/LICENSE must be byte-identical");
   } catch (error) {
     errors.push(`Validate LICENSE parity: ${error.message}`);
+  }
+}
+
+async function validateReleaseWorkflowContract() {
+  const workflowPath = path.join(repoRoot, ".github", "workflows", "release.yml");
+  let workflow;
+  try {
+    workflow = await readUtf8(workflowPath);
+  } catch (error) {
+    errors.push(`Validate release workflow: ${error.message}`);
+    return;
+  }
+
+  for (const required of [
+    "workflow_dispatch:",
+    "ref: ${{ env.RELEASE_REF }}",
+    '--commit "$RELEASE_COMMIT"',
+    "github.rest.repos.uploadReleaseAsset",
+  ]) {
+    if (!workflow.includes(required)) errors.push(`Release workflow is missing required contract: ${required}`);
+  }
+  if (workflow.includes('github.request("POST /repos/{owner}/{repo}/releases/{release_id}/assets"')) {
+    errors.push("Release workflow must use the dedicated release-asset upload endpoint");
+  }
+
+  const draftIndex = workflow.indexOf("draft: true");
+  const uploadIndex = workflow.indexOf("github.rest.repos.uploadReleaseAsset");
+  const publishIndex = workflow.lastIndexOf("draft: false");
+  if (draftIndex < 0 || uploadIndex < 0 || publishIndex < 0 || !(draftIndex < uploadIndex && uploadIndex < publishIndex)) {
+    errors.push("Release workflow must create a draft, upload verified assets, then publish it");
+  }
+  if (uploadIndex >= 0 && workflow.slice(0, uploadIndex).includes("draft: false")) {
+    errors.push("Release workflow must not publish a new release before verified asset upload");
+  }
+
+  const checkoutCount = workflow.match(/uses: actions\/checkout@/g)?.length ?? 0;
+  const tagBoundCheckoutCount = workflow.match(/ref: \$\{\{ env\.RELEASE_REF \}\}/g)?.length ?? 0;
+  if (checkoutCount === 0 || tagBoundCheckoutCount !== checkoutCount) {
+    errors.push(`Every release checkout must bind RELEASE_REF (${tagBoundCheckoutCount}/${checkoutCount})`);
   }
 }
 
