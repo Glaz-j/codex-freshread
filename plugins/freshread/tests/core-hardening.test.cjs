@@ -352,6 +352,62 @@ test("an old lock owned by a live process is never reclaimed", (t) => {
   engine._releaseLock(token);
 });
 
+test("release does not strand an empty lock after transient directory contention", (t) => {
+  const fx = fixture(t);
+  const engine = fx.engine("release-contention-session", { lockTimeoutMs: 250, staleLockMs: 1000 });
+  const token = engine._acquireLock();
+  const rmdirSync = fs.rmdirSync;
+  let injected = false;
+  fs.rmdirSync = function patchedRmdirSync(candidate) {
+    if (!injected && pathKey(candidate) === pathKey(engine.lockPath)) {
+      injected = true;
+      const error = new Error("simulated transient directory contention");
+      error.code = "ENOTEMPTY";
+      throw error;
+    }
+    return rmdirSync.call(fs, candidate);
+  };
+  t.after(() => { fs.rmdirSync = rmdirSync; });
+
+  engine._releaseLock(token);
+  assert.equal(injected, true);
+  assert.equal(fs.existsSync(engine.lockPath), false);
+});
+
+test("release stops if a different owner marker appears during cleanup", (t) => {
+  const fx = fixture(t);
+  const engine = fx.engine("release-owner-race-session", { lockTimeoutMs: 250, staleLockMs: 1000 });
+  const token = engine._acquireLock();
+  const ownerPath = engine._lockOwnerPath(token);
+  const replacementToken = "00000000-0000-4000-8000-000000000000";
+  const replacementOwnerPath = engine._lockOwnerPath(replacementToken);
+  const unlinkSync = fs.unlinkSync;
+  let injected = false;
+  fs.unlinkSync = function patchedUnlinkSync(candidate) {
+    if (!injected && pathKey(candidate) === pathKey(ownerPath)) {
+      injected = true;
+      unlinkSync.call(fs, candidate);
+      fs.writeFileSync(
+        replacementOwnerPath,
+        `${JSON.stringify({ token: replacementToken, pid: process.pid, createdAt: new Date().toISOString() })}\n`,
+        { flag: "wx" }
+      );
+      return;
+    }
+    return unlinkSync.call(fs, candidate);
+  };
+  try {
+    assert.throws(() => engine._releaseLock(token), /different owner/i);
+  } finally {
+    fs.unlinkSync = unlinkSync;
+  }
+
+  assert.equal(injected, true);
+  assert.equal(fs.existsSync(engine.lockPath), true);
+  assert.equal(fs.existsSync(replacementOwnerPath), true);
+  engine._releaseLock(replacementToken);
+});
+
 test("a transient Windows EPERM while creating the lock is retried as contention", { skip: process.platform !== "win32" }, (t) => {
   const fx = fixture(t);
   const engine = fx.engine("transient-lock-session", { lockTimeoutMs: 250, staleLockMs: 1000 });

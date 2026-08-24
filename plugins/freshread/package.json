@@ -17,7 +17,7 @@
     "node": ">=18.18"
   },
   "scripts": {
-    "test": "node --test --test-concurrency=1 tests/*.test.cjs",
+    "test": "node --test --test-concurrency=1 tests/command-analyzer.test.cjs tests/contracts.test.cjs tests/core-hardening.test.cjs tests/edge-cases.test.cjs tests/hook-handler.test.cjs tests/tool-evidence.test.cjs",
     "benchmark": "node benchmarks/run-benchmark.cjs",
     "benchmark:baseline": "node benchmarks/run-benchmark.cjs --baseline-only",
     "benchmark:live": "node benchmarks/run-live-benchmark.cjs",

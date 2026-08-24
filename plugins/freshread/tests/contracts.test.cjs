@@ -91,6 +91,20 @@ function launcherFixture(t) {
   return { attackerBin, pluginData, workspace };
 }
 
+function trustedNodeExecutable() {
+  if (process.platform !== "win32") return process.execPath;
+  const roots = [
+    process.env.ProgramFiles,
+    process.env.ProgramW6432,
+    process.env["ProgramFiles(x86)"],
+  ].filter(Boolean);
+  for (const root of roots) {
+    const candidate = path.join(root, "nodejs", "node.exe");
+    if (fs.existsSync(candidate)) return fs.realpathSync.native(candidate);
+  }
+  assert.fail("a system Node installation under Program Files is required for the Windows launcher contract");
+}
+
 test("all hook events use fixed-system launchers with a 30-second timeout", () => {
   const pluginRoot = path.resolve(__dirname, "..");
   const config = JSON.parse(fs.readFileSync(path.join(pluginRoot, "hooks", "hooks.json"), "utf8"));
@@ -126,7 +140,7 @@ test("all hook events use fixed-system launchers with a 30-second timeout", () =
 test("launcher rejects workspace and relative PATH node candidates while preserving plugin environment", (t) => {
   const fx = launcherFixture(t);
   const pluginRoot = path.resolve(__dirname, "..");
-  const trustedNodeDir = path.dirname(process.execPath);
+  const trustedNodeDir = path.dirname(trustedNodeExecutable());
   const event = {
     session_id: "launcher-contract",
     cwd: fx.workspace,
@@ -172,7 +186,8 @@ test("launcher rejects workspace and relative PATH node candidates while preserv
 
 test("Windows fast discovery rejects workspace PATH entries and selects a normal absolute Node", { skip: process.platform !== "win32" }, (t) => {
   const fx = launcherFixture(t);
-  const trustedNodeDir = path.dirname(process.execPath);
+  const trustedNode = trustedNodeExecutable();
+  const trustedNodeDir = path.dirname(trustedNode);
   const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT;
   const cscript = path.join(systemRoot, "System32", "cscript.exe");
   const discovery = path.join(pluginRoot, "scripts", "freshread-node-path.js");
@@ -187,7 +202,7 @@ test("Windows fast discovery rejects workspace PATH entries and selects a normal
     encoding: "utf8",
   });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(path.resolve(result.stdout.trim()).toLowerCase(), path.resolve(process.execPath).toLowerCase());
+  assert.equal(path.resolve(result.stdout.trim()).toLowerCase(), path.resolve(trustedNode).toLowerCase());
 });
 
 test("Windows fast discovery explicitly rejects reparse-backed workspaces", { skip: process.platform !== "win32" }, (t) => {

@@ -48,27 +48,52 @@ function fixture(t) {
   };
 }
 
+function quoteShellLiteral(value) {
+  const text = String(value);
+  return process.platform === "win32"
+    ? `'${text.replace(/'/g, "''")}'`
+    : `'${text.replace(/'/g, `'"'"'`)}'`;
+}
+
+function canonicalReadCommand(...targets) {
+  const quotedTargets = targets.map(quoteShellLiteral).join(" ");
+  return process.platform === "win32"
+    ? `Get-Content -LiteralPath ${quotedTargets} -Raw -Encoding utf8`
+    : `cat -- ${quotedTargets}`;
+}
+
+function canonicalReadOutput(contents) {
+  return process.platform === "win32" ? `${contents}\r\n` : contents;
+}
+
 test("only simple complete text reads qualify for verified rewriting", (t) => {
   const fx = fixture(t);
   const dynamicLiteral = path.join(fx.root, "src", "$name.ts");
   const commaLiteral = path.join(fx.root, "src", "a,b.ts");
   fs.writeFileSync(dynamicLiteral, "must not be read as a literal expansion\n");
   fs.writeFileSync(commaLiteral, "comma\n");
-  const exact = exactShellReadPlan(fx.event("read-1", "Get-Content -LiteralPath '.\\src\\auth file.ts' -Raw -Encoding utf8"));
+  const relativeTarget = "src/auth file.ts";
+  const exact = exactShellReadPlan(fx.event("read-1", canonicalReadCommand(relativeTarget)));
   assert.deepEqual(exact.paths, [fx.target]);
-  assert.equal(exactShellReadPlan(fx.event("read-2", "Get-Content src/auth.ts | Select-Object -First 1")), null);
-  assert.equal(exactShellReadPlan(fx.event("read-3", "Get-Content -Tail 1 '.\\src\\auth file.ts'")), null);
+  assert.equal(exactShellReadPlan(fx.event("read-2", process.platform === "win32"
+    ? "Get-Content src/auth.ts | Select-Object -First 1"
+    : "cat -- src/auth.ts | head -n 1")), null);
+  assert.equal(exactShellReadPlan(fx.event("read-3", process.platform === "win32"
+    ? "Get-Content -Tail 1 'src/auth file.ts'"
+    : "head -n 1 -- 'src/auth file.ts'")), null);
   assert.equal(exactShellReadPlan(fx.event("read-4", "rg alpha src")), null);
-  assert.equal(exactShellReadPlan(fx.event("read-5", 'Get-Content "src/$name.ts" -Raw')), null);
-  assert.equal(exactShellReadPlan(fx.event("read-6", "Get-Content src/auth.ts\nGet-Content src/other.ts")), null);
-  const ambiguousRelative = fx.event("read-7", "Get-Content -LiteralPath '.\\src\\auth file.ts' -Raw -Encoding utf8");
+  assert.equal(exactShellReadPlan(fx.event("read-5", process.platform === "win32"
+    ? 'Get-Content "src/$name.ts" -Raw'
+    : 'cat -- "src/$name.ts"')), null);
+  assert.equal(exactShellReadPlan(fx.event(
+    "read-6",
+    `${canonicalReadCommand("src/auth.ts")}\n${canonicalReadCommand("src/other.ts")}`,
+  )), null);
+  const ambiguousRelative = fx.event("read-7", canonicalReadCommand(relativeTarget));
   delete ambiguousRelative.tool_input.workdir;
   assert.equal(exactShellReadPlan(ambiguousRelative), null);
-  assert.equal(exactShellReadPlan(fx.event("read-8", "Get-Content -LiteralPath 'src/a,b.ts' -Raw")), null);
-  const duplicate = exactShellReadPlan(fx.event(
-    "read-9",
-    "Get-Content -LiteralPath '.\\src\\auth file.ts' '.\\src\\auth file.ts' -Raw -Encoding utf8",
-  ));
+  assert.equal(exactShellReadPlan(fx.event("read-8", canonicalReadCommand("src/a,b.ts"))), null);
+  const duplicate = exactShellReadPlan(fx.event("read-9", canonicalReadCommand(relativeTarget, relativeTarget)));
   assert.equal(duplicate, null);
 });
 
@@ -78,7 +103,7 @@ test("observed reads reject multi-file output because individual byte boundaries
   fs.writeFileSync(second, "beta\n");
   const event = fx.event(
     "multi-file-boundary",
-    `Get-Content -LiteralPath '${fx.target}' '${second}' -Raw -Encoding utf8`,
+    canonicalReadCommand(fx.target, second),
   );
   assert.equal(exactObservedReadPlan(event), null);
   assert.equal(prepareObservedRead(fx.engine, event), null);
@@ -86,7 +111,7 @@ test("observed reads reject multi-file output because individual byte boundaries
 
 test("trusted reader evidence binds the bytes written to stdout to a stable SHA-256 snapshot", (t) => {
   const fx = fixture(t);
-  const event = fx.event("verified-read", "Get-Content -LiteralPath '.\\src\\auth file.ts' -Raw -Encoding utf8");
+  const event = fx.event("verified-read", canonicalReadCommand("src/auth file.ts"));
   const prepared = prepareVerifiedRead(fx.engine, event);
   assert.ok(prepared);
   assert.match(prepared.command, /freshread-read\.cjs/);
@@ -108,12 +133,12 @@ test("trusted reader evidence binds the bytes written to stdout to a stable SHA-
 
 test("observed reads record only canonical raw output that exactly matches current file bytes", (t) => {
   const fx = fixture(t);
-  const event = fx.event("observed-read", `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8`);
+  const event = fx.event("observed-read", canonicalReadCommand(fx.target));
   const plan = exactObservedReadPlan(event);
   assert.deepEqual(plan.paths, [fx.target]);
   const prepared = prepareObservedRead(fx.engine, event);
   assert.ok(prepared);
-  const rendered = `alpha\n${process.platform === "win32" ? "\r\n" : "\n"}`;
+  const rendered = canonicalReadOutput("alpha\n");
   const evidence = consumeToolEvidence(fx.engine, { ...event, tool_response: rendered });
   assert.equal(evidence.kind, "observed-read");
   assert.equal(evidence.success, true);
@@ -125,10 +150,10 @@ test("observed reads reject transformed, stale, structured, and empty output", (
   const fx = fixture(t);
   for (const [id, response, mutate] of [
     ["transformed-output", "alpha\nextra\n", false],
-    ["stale-output", `alpha\n${process.platform === "win32" ? "\r\n" : "\n"}`, true],
+    ["stale-output", canonicalReadOutput("alpha\n"), true],
     ["structured-output", { output: "alpha\n" }, false],
   ]) {
-    const event = fx.event(id, `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8`);
+    const event = fx.event(id, canonicalReadCommand(fx.target));
     prepareObservedRead(fx.engine, event);
     if (mutate) fs.writeFileSync(fx.target, "beta\n");
     const evidence = consumeToolEvidence(fx.engine, { ...event, tool_response: response });
@@ -137,7 +162,7 @@ test("observed reads reject transformed, stale, structured, and empty output", (
   }
 
   fs.writeFileSync(fx.target, "");
-  const emptyEvent = fx.event("empty-output", `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8`);
+  const emptyEvent = fx.event("empty-output", canonicalReadCommand(fx.target));
   prepareObservedRead(fx.engine, emptyEvent);
   const empty = consumeToolEvidence(fx.engine, { ...emptyEvent, tool_response: "" });
   assert.equal(empty.success, false);
@@ -170,7 +195,7 @@ test("shell outcome evidence distinguishes success from missing or failed execut
 test("verified reader binds binary output to a snapshot without persisting content", (t) => {
   const fx = fixture(t);
   fs.writeFileSync(fx.target, Buffer.from([0, 1, 2, 3]));
-  const event = fx.event("binary-read", "Get-Content -LiteralPath '.\\src\\auth file.ts' -Raw -Encoding utf8");
+  const event = fx.event("binary-read", canonicalReadCommand("src/auth file.ts"));
   const prepared = prepareVerifiedRead(fx.engine, event);
   const script = path.resolve(__dirname, "..", "scripts", "freshread-read.cjs");
   const run = spawnSync(process.execPath, [script, prepared.pendingPath]);

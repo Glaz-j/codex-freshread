@@ -48,12 +48,30 @@ function runUpdatedShell(command, cwd) {
   return spawnSync("/bin/sh", ["-c", command], { cwd, encoding: "utf8" });
 }
 
+function quoteShellLiteral(value) {
+  const text = String(value);
+  return process.platform === "win32"
+    ? `'${text.replace(/'/g, "''")}'`
+    : `'${text.replace(/'/g, `'"'"'`)}'`;
+}
+
+function canonicalReadCommand(target) {
+  const quoted = quoteShellLiteral(target);
+  return process.platform === "win32"
+    ? `Get-Content -LiteralPath ${quoted} -Raw -Encoding utf8`
+    : `cat -- ${quoted}`;
+}
+
+function canonicalReadOutput(contents) {
+  return process.platform === "win32" ? `${contents}\r\n` : contents;
+}
+
 test("observed Pre/PostToolUse read records only output that exactly matches the file", (t) => {
   const fx = fixture(t);
   const preEvent = fx.base("PreToolUse", {
     tool_name: "Bash",
     tool_use_id: "tool-read",
-    tool_input: { command: `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8` },
+    tool_input: { command: canonicalReadCommand(fx.target) },
   });
   assert.equal(handleHookEvent(preEvent, fx.options), null);
   const run = runUpdatedShell(preEvent.tool_input.command, fx.root);
@@ -74,7 +92,7 @@ test("observed Pre/PostToolUse read records only output that exactly matches the
   assert.match(output.hookSpecificOutput.additionalContext, /src[\\/]auth\.ts/);
 });
 
-test("canonical Windows PowerShell carrier establishes a snapshot and blocks a later stale write", (t) => {
+test("canonical Windows PowerShell carrier establishes a snapshot and blocks a later stale write", { skip: process.platform !== "win32" }, (t) => {
   const fx = fixture(t);
   const shell = "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe";
   const readInner = `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8`;
@@ -85,7 +103,7 @@ test("canonical Windows PowerShell carrier establishes a snapshot and blocks a l
     tool_input: { command: readCommand },
   });
   assert.equal(handleHookEvent(preRead, fx.options), null);
-  const rendered = `A\n${process.platform === "win32" ? "\r\n" : "\n"}`;
+  const rendered = canonicalReadOutput("A\n");
   assert.equal(handleHookEvent({ ...preRead, hook_event_name: "PostToolUse", tool_response: rendered }, fx.options), null);
   assert.equal(fx.engine().inspect(fx.target).state, STATES.FRESH);
 
@@ -105,7 +123,7 @@ test("failed PostToolUse reads never establish a FRESH snapshot", (t) => {
   const failedRead = fx.base("PostToolUse", {
     tool_name: "Bash",
     tool_use_id: "tool-read-failed",
-    tool_input: { command: `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8` },
+    tool_input: { command: canonicalReadCommand(fx.target) },
     tool_response: "Get-Content failed",
   });
   assert.equal(handleHookEvent(failedRead, fx.options), null);
@@ -117,12 +135,12 @@ test("a file changed after verified output but before PostToolUse is never misla
   const pre = fx.base("PreToolUse", {
     tool_name: "Bash",
     tool_use_id: "tool-read-race",
-    tool_input: { command: `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8` },
+    tool_input: { command: canonicalReadCommand(fx.target) },
   });
   assert.equal(handleHookEvent(pre, fx.options), null);
   const run = runUpdatedShell(pre.tool_input.command, fx.root);
   assert.equal(run.status, 0, run.stderr);
-  assert.equal(run.stdout, `A\n${process.platform === "win32" ? "\r\n" : "\n"}`);
+  assert.equal(run.stdout, canonicalReadOutput("A\n"));
   fs.writeFileSync(fx.target, "B\n");
   const post = fx.base("PostToolUse", {
     tool_name: "Bash",
@@ -315,7 +333,7 @@ test("hook runner completes the observed read protocol without rewriting the com
   const preEvent = fx.base("PreToolUse", {
     tool_name: "Bash",
     tool_use_id: "tool-read",
-    tool_input: { command: `Get-Content -LiteralPath '${fx.target}' -Raw -Encoding utf8` },
+    tool_input: { command: canonicalReadCommand(fx.target) },
   });
   const pre = spawnSync(process.execPath, [script], {
     input: JSON.stringify(preEvent),

@@ -35,8 +35,9 @@ The deterministic release prerequisite contains independent gates:
   source body. The trusted-reader path is retained as an internal compatibility
   test, not as the default product claim;
 - performance: identical 100- and 1000-file metadata-loop workloads, zero
-  re-hashes on unchanged checkpoints, a same-launcher cold hook comparison with
-  20 paired launches per arm in alternating AB/BA order, an
+  re-hashes on unchanged checkpoints, a same-launcher empty-state cold-process
+  comparison with 20 paired launches per arm in alternating AB/BA order measured
+  before the high-churn synthetic file workloads, an
   interleaved configured-launcher comparison over a persisted 1000-file Read
   Set, and explicit near-Nth-read/linear-work gates. Every latency comparison
   must independently pass both its absolute p95 budget and its baseline-delta

@@ -41,11 +41,11 @@ function assertGuardCovers(analysis, target, message) {
 
 test("parses PowerShell Get-Content literal paths", (t) => {
   const root = tempFixture(t);
-  const paths = readPathsFromCommand("Get-Content -LiteralPath '.\\src\\auth file.ts' -Encoding UTF8 -Raw", root, "needle");
+  const paths = readPathsFromCommand("Get-Content -LiteralPath 'src/auth file.ts' -Encoding UTF8 -Raw", root, "needle");
   assert.deepEqual(paths, [path.join(root, "src", "auth file.ts")]);
 });
 
-test("unwraps the absolute PowerShell carrier emitted by canonical Windows Codex execution", (t) => {
+test("unwraps the absolute PowerShell carrier emitted by canonical Windows Codex execution", { skip: process.platform !== "win32" }, (t) => {
   const root = tempFixture(t);
   const target = path.join(root, "src", "auth file.ts");
   const inner = `Get-Content -LiteralPath '${target}' -Raw -Encoding utf8`;
@@ -60,7 +60,7 @@ test("unwraps the absolute PowerShell carrier emitted by canonical Windows Codex
   assert.deepEqual(analysis.readPaths, [target]);
 });
 
-test("preserves Windows path separators inside PowerShell double quotes", (t) => {
+test("preserves Windows path separators inside PowerShell double quotes", { skip: process.platform !== "win32" }, (t) => {
   const root = tempFixture(t);
   const paths = readPathsFromCommand('Get-Content -LiteralPath ".\\src\\auth file.ts" -Raw', root, "needle");
   assert.deepEqual(paths, [path.join(root, "src", "auth file.ts")]);
@@ -69,7 +69,7 @@ test("preserves Windows path separators inside PowerShell double quotes", (t) =>
 test("parses explicit rg file targets but ignores rg --files", (t) => {
   const root = tempFixture(t);
   assert.deepEqual(
-    readPathsFromCommand("rg -n needle '.\\src\\session.ts'", root, "1:needle"),
+    readPathsFromCommand("rg -n needle 'src/session.ts'", root, "1:needle"),
     [path.join(root, "src", "session.ts")],
   );
   assert.deepEqual(
@@ -123,11 +123,11 @@ test("apply_patch treats shell metacharacters as literal filenames and rejects p
 test("parses direct shell and PowerShell write targets", (t) => {
   const root = tempFixture(t);
   assert.deepEqual(
-    writePathsFromCommand("Set-Content -LiteralPath '.\\src\\session.ts' -Value updated", root),
+    writePathsFromCommand("Set-Content -LiteralPath 'src/session.ts' -Value updated", root),
     [path.join(root, "src", "session.ts")],
   );
   assert.deepEqual(
-    writePathsFromCommand("echo updated >> '.\\src\\auth file.ts'", root),
+    writePathsFromCommand("echo updated >> 'src/auth file.ts'", root),
     [path.join(root, "src", "auth file.ts")],
   );
 });
@@ -272,12 +272,12 @@ test("parses both source and destination for copy and move commands", (t) => {
   const root = tempFixture(t);
   for (const command of ["Copy-Item", "Move-Item"]) {
     assert.deepEqual(
-      writePathsFromCommand(`${command} -LiteralPath '.\\src\\session.ts' -Destination '.\\src\\result.ts'`, root),
+      writePathsFromCommand(`${command} -LiteralPath 'src/session.ts' -Destination 'src/result.ts'`, root),
       [path.join(root, "src", "session.ts"), path.join(root, "src", "result.ts")],
     );
   }
   assert.deepEqual(
-    writePathsFromCommand("Copy-Item '.\\src\\session.ts' -Destination '.\\src\\result.ts'", root),
+    writePathsFromCommand("Copy-Item 'src/session.ts' -Destination 'src/result.ts'", root),
     [path.join(root, "src", "session.ts"), path.join(root, "src", "result.ts")],
   );
 });
@@ -327,7 +327,7 @@ test("flags deterministic edit tools whose target cannot be resolved", (t) => {
   for (const event of [
     { cwd: root, tool_name: "apply_patch", tool_input: { command: "*** Begin Patch\n*** End Patch" } },
     { cwd: root, tool_name: "Edit", tool_input: { old_string: "old", new_string: "new" } },
-    { cwd: root, tool_name: "Write", tool_input: { path: "..\\outside.ts", content: "new" } },
+    { cwd: root, tool_name: "Write", tool_input: { path: "../outside.ts", content: "new" } },
   ]) {
     const result = analyzeToolEvent(event, "pre");
     assert.deepEqual(result.writePaths, []);
@@ -384,7 +384,7 @@ test("dynamic and outside-workspace paths are ignored", (t) => {
   assert.deepEqual(writePathsFromCommand("Set-Content src/%NAME%/file.ts updated", root), []);
   assert.deepEqual(writePathsFromCommand("Set-Content src/!NAME!/file.ts updated", root), []);
   assert.deepEqual(writePathsFromCommand("Set-Content ~/file.ts updated", root), []);
-  assert.deepEqual(writePathsFromCommand("Set-Content ..\\outside.ts x", root), []);
+  assert.deepEqual(writePathsFromCommand("Set-Content ../outside.ts x", root), []);
 });
 
 test("recognized writers fail closed when quoted literal targets contain dynamic metacharacters", (t) => {

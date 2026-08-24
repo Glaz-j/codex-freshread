@@ -555,10 +555,40 @@ class FreshReadEngine {
       if (error.code !== "ENOENT") throw error;
     }
     if (removedOwner) {
-      try {
-        fs.rmdirSync(this.lockPath);
-      } catch (error) {
-        if (!["ENOENT", "ENOTEMPTY", "EEXIST"].includes(error.code)) throw error;
+      const started = Date.now();
+      const releaseTimeoutMs = Math.min(this.lockTimeoutMs, 1000);
+      const expectedOwnerName = path.basename(this._lockOwnerPath(token));
+      while (true) {
+        try {
+          fs.rmdirSync(this.lockPath);
+          break;
+        } catch (error) {
+          if (error.code === "ENOENT") break;
+          const transientWindowsContention = process.platform === "win32" &&
+            ["EPERM", "EACCES"].includes(error.code);
+          if (!["ENOTEMPTY", "EEXIST"].includes(error.code) && !transientWindowsContention) throw error;
+          let names;
+          try {
+            names = fs.readdirSync(this.lockPath);
+          } catch (readError) {
+            if (readError.code === "ENOENT") break;
+            const transientWindowsReadContention = process.platform === "win32" &&
+              ["EPERM", "EACCES"].includes(readError.code);
+            if (!transientWindowsReadContention) throw readError;
+          }
+          if (names && names.some((name) => name !== expectedOwnerName)) {
+            throw new Error("refusing to release a FreshRead state lock with a different owner");
+          }
+          if (Date.now() - started >= releaseTimeoutMs) {
+            throw new Error("timed out releasing FreshRead state lock", { cause: error });
+          }
+          Atomics.wait(
+            WAIT_BUFFER,
+            0,
+            0,
+            Math.min(5, Math.max(1, releaseTimeoutMs - (Date.now() - started)))
+          );
+        }
       }
     }
     if (this.lockToken === token) this.lockToken = null;

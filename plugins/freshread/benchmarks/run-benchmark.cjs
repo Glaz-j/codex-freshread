@@ -279,6 +279,31 @@ function runUpdatedShell(command, cwd) {
   return childProcess.spawnSync("/bin/sh", ["-c", command], { cwd, encoding: "utf8" });
 }
 
+function quoteShellLiteral(value) {
+  const text = String(value);
+  return process.platform === "win32"
+    ? `'${text.replace(/'/g, "''")}'`
+    : `'${text.replace(/'/g, `'"'"'`)}'`;
+}
+
+function canonicalReadCommand(target) {
+  const quoted = quoteShellLiteral(target);
+  return process.platform === "win32"
+    ? `Get-Content -LiteralPath ${quoted} -Raw -Encoding utf8`
+    : `cat -- ${quoted}`;
+}
+
+function canonicalCopyMoveCommand(kind, source, destination) {
+  const sourcePath = quoteShellLiteral(source);
+  const destinationPath = quoteShellLiteral(destination);
+  if (process.platform === "win32") {
+    const commandName = kind === "shell-copy" ? "Copy-Item" : "Move-Item";
+    return `${commandName} -LiteralPath ${sourcePath} -Destination ${destinationPath}`;
+  }
+  const commandName = kind === "shell-copy" ? "cp" : "mv";
+  return `${commandName} -- ${sourcePath} ${destinationPath}`;
+}
+
 function configuredHookLauncher() {
   const hooksConfig = JSON.parse(fs.readFileSync(path.resolve(__dirname, "..", "hooks", "hooks.json"), "utf8"));
   const promptHook = hooksConfig.hooks.UserPromptSubmit[0].hooks[0];
@@ -576,18 +601,11 @@ function runHandlerGuardCase(modules, adapterFactory, armName, kind) {
         },
       });
     } else {
-      const commandName = kind === "shell-copy" ? "Copy-Item" : "Move-Item";
       event = makeHookEvent(tempRoot, sessionId, "PreToolUse", {
         tool_name: "Bash",
         tool_use_id: "guard-" + kind,
         tool_input: {
-          command:
-            commandName +
-            " -Path '" +
-            source +
-            "' -Destination '" +
-            destination +
-            "'",
+          command: canonicalCopyMoveCommand(kind, source, destination),
         },
       });
     }
@@ -666,7 +684,7 @@ function runHandlerProtocolMatrix(modules) {
     const target = writeFile(tempRoot, "src/auth.ts", "A\n");
     let caseResult;
     try {
-      const observedCommand = `Get-Content -LiteralPath '${target}' -Raw -Encoding utf8`;
+      const observedCommand = canonicalReadCommand(target);
       const preEvent = makeHookEvent(tempRoot, sessionId, "PreToolUse", {
         tool_name: "Bash",
         tool_use_id: "handler-observed-read",
@@ -758,7 +776,7 @@ function runSecurityMatrix(modules) {
     try {
       modules.handleHookEvent(makeHookEvent(tempRoot, sessionId, "PostToolUse", {
         tool_name: "Bash",
-        tool_input: { command: `Get-Content -LiteralPath '${target}'` },
+        tool_input: { command: canonicalReadCommand(target) },
         tool_response: { exit_code: 1, output: "failed" },
       }), { dataDir });
       const state = new modules.FreshReadEngine(makeOptions(tempRoot, dataDir, sessionId, true)).inspect(target).state;
@@ -782,7 +800,7 @@ function runSecurityMatrix(modules) {
       const preEvent = makeHookEvent(tempRoot, sessionId, "PreToolUse", {
         tool_name: "Bash",
         tool_use_id: "security-read-race",
-        tool_input: { command: `Get-Content -LiteralPath '${target}' -Raw -Encoding utf8` },
+        tool_input: { command: canonicalReadCommand(target) },
       });
       const preOutput = modules.handleHookEvent(preEvent, { dataDir });
       const execution = runUpdatedShell(preEvent.tool_input.command, tempRoot);
@@ -1111,7 +1129,62 @@ function runColdHookSpawn(iterations) {
   }
 }
 
+function runColdHookGate(profile) {
+  if (profile.coldHookIterations > 0) {
+    const raw = runColdHookSpawn(profile.coldHookIterations);
+    const latency = evaluatePairedLatencyGate(
+      raw.freshread.p95Ms,
+      raw.pairs.map(function pairedDelta(pair) { return pair.deltaMs; }),
+      profile.coldHookAbsoluteBudgetMs,
+      profile.coldHookDeltaBudgetMs,
+    );
+    return Object.assign({}, latency, raw, {
+      required: true,
+      status: "RUN",
+      passed:
+        latency.passed &&
+        raw.baseline.failures.length === 0 &&
+        raw.freshread.failures.length === 0,
+    });
+  }
+
+  const skipped = {
+    enabled: null,
+    iterations: 0,
+    p50Ms: null,
+    p95Ms: null,
+    p99Ms: null,
+    failures: [],
+  };
+  return {
+    required: false,
+    status: "SKIPPED_QUICK_PROFILE",
+    order: null,
+    iterationsPerArm: 0,
+    pairs: [],
+    baseline: Object.assign({}, skipped, { enabled: false }),
+    freshread: Object.assign({}, skipped, { enabled: true }),
+    p95DeltaMs: null,
+    p95BudgetMs: null,
+    p95AbsoluteBudgetMs: null,
+    p95DeltaBudgetMs: null,
+    deltaMethod: "paired-freshread-minus-baseline",
+    pairedDeltaP50Ms: null,
+    pairedDeltaP95Ms: null,
+    pairedDeltaP99Ms: null,
+    absolutePassed: null,
+    deltaPassed: null,
+    passed: true,
+  };
+}
+
 function runPerformanceSuite(candidateFactory, profile) {
+  // Empty-state process-startup latency is measured before the high-churn
+  // 100/1000-file workloads. Those workloads intentionally create and rewrite
+  // growing state files; running the cold gate afterward would mix startup with
+  // order-dependent host resource pressure and background work. The gate still
+  // retains all 20 AB/BA pairs and both latency budgets.
+  const cold = runColdHookGate(profile);
   const cases = profile.performanceCases;
   const baseline = {};
   const freshread = {};
@@ -1192,54 +1265,6 @@ function runPerformanceSuite(candidateFactory, profile) {
     linearWorkPassed,
     passed: nthReadLatency.passed && nearNthReadLatency.passed && linearWorkPassed,
   };
-
-  let cold;
-  if (profile.coldHookIterations > 0) {
-    const raw = runColdHookSpawn(profile.coldHookIterations);
-    const latency = evaluatePairedLatencyGate(
-      raw.freshread.p95Ms,
-      raw.pairs.map(function pairedDelta(pair) { return pair.deltaMs; }),
-      profile.coldHookAbsoluteBudgetMs,
-      profile.coldHookDeltaBudgetMs,
-    );
-    cold = Object.assign({}, latency, raw, {
-      required: true,
-      status: "RUN",
-      passed:
-        latency.passed &&
-        raw.baseline.failures.length === 0 &&
-        raw.freshread.failures.length === 0,
-    });
-  } else {
-    const skipped = {
-      enabled: null,
-      iterations: 0,
-      p50Ms: null,
-      p95Ms: null,
-      p99Ms: null,
-      failures: [],
-    };
-    cold = {
-      required: false,
-      status: "SKIPPED_QUICK_PROFILE",
-      order: null,
-      iterationsPerArm: 0,
-      pairs: [],
-      baseline: Object.assign({}, skipped, { enabled: false }),
-      freshread: Object.assign({}, skipped, { enabled: true }),
-      p95DeltaMs: null,
-      p95BudgetMs: null,
-      p95AbsoluteBudgetMs: null,
-      p95DeltaBudgetMs: null,
-      deltaMethod: "paired-freshread-minus-baseline",
-      pairedDeltaP50Ms: null,
-      pairedDeltaP95Ms: null,
-      pairedDeltaP99Ms: null,
-      absolutePassed: null,
-      deltaPassed: null,
-      passed: true,
-    };
-  }
 
   let populated;
   if (profile.populatedHookIterations > 0) {
