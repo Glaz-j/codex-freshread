@@ -1,0 +1,2380 @@
+{
+  "schemaVersion": 3,
+  "generatedAt": "2026-08-24T06:10:24.032Z",
+  "sourceTree": {
+    "algorithm": "SHA-256",
+    "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+    "fileCount": 32,
+    "excludes": [
+      "node_modules/**",
+      ".git/**",
+      "benchmarks/results/**"
+    ]
+  },
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.15.0"
+  },
+  "executionProfile": {
+    "name": "full-release",
+    "fullScale": true,
+    "deterministicEligible": true,
+    "performanceWorkloads": [
+      {
+        "key": "100",
+        "files": 100,
+        "iterations": 20
+      },
+      {
+        "key": "1000",
+        "files": 1000,
+        "iterations": 8
+      }
+    ],
+    "coldHookIterations": 20,
+    "readGrowthKey": "1000",
+    "populatedHookKey": "1000",
+    "populatedHookIterations": 8
+  },
+  "expectedCaseIds": [
+    "C01-unchanged-read",
+    "C02-external-change",
+    "C03-self-change",
+    "C04-reread-refreshes",
+    "C05-missing-file",
+    "C06-resume-detects-drift",
+    "C07-compaction-persists-metadata",
+    "C08-untracked-is-unknown"
+  ],
+  "scenarioIntegrity": {
+    "expected": [
+      "C01-unchanged-read",
+      "C02-external-change",
+      "C03-self-change",
+      "C04-reread-refreshes",
+      "C05-missing-file",
+      "C06-resume-detects-drift",
+      "C07-compaction-persists-metadata",
+      "C08-untracked-is-unknown"
+    ],
+    "actual": [
+      "C01-unchanged-read",
+      "C02-external-change",
+      "C03-self-change",
+      "C04-reread-refreshes",
+      "C05-missing-file",
+      "C06-resume-detects-drift",
+      "C07-compaction-persists-metadata",
+      "C08-untracked-is-unknown"
+    ],
+    "passed": true
+  },
+  "scenarios": [
+    {
+      "id": "C01-unchanged-read",
+      "expected": "FRESH"
+    },
+    {
+      "id": "C02-external-change",
+      "expected": "STALE_EXTERNAL"
+    },
+    {
+      "id": "C03-self-change",
+      "expected": "STALE_SELF"
+    },
+    {
+      "id": "C04-reread-refreshes",
+      "expected": "FRESH"
+    },
+    {
+      "id": "C05-missing-file",
+      "expected": "MISSING"
+    },
+    {
+      "id": "C06-resume-detects-drift",
+      "expected": "STALE_EXTERNAL"
+    },
+    {
+      "id": "C07-compaction-persists-metadata",
+      "expected": "FRESH"
+    },
+    {
+      "id": "C08-untracked-is-unknown",
+      "expected": "UNKNOWN"
+    }
+  ],
+  "baseline": {
+    "summary": {
+      "name": "stock/no-plugin",
+      "requiredCasesPassed": 0,
+      "requiredCasesTotal": 8,
+      "exactAccuracy": 0,
+      "staleMissingRecall": 0,
+      "freshFalsePositiveRate": 0,
+      "unknownAsFreshCount": 0,
+      "preEditGuardRate": 0
+    },
+    "cases": [
+      {
+        "id": "C01-unchanged-read",
+        "expected": "FRESH",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "FRESH",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "NONE",
+            "observed": "NONE",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C02-external-change",
+        "expected": "STALE_EXTERNAL",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "STALE_EXTERNAL",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "STALE_EXTERNAL",
+            "observed": "NONE",
+            "passed": false
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C03-self-change",
+        "expected": "STALE_SELF",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "STALE_SELF",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "STALE_SELF",
+            "observed": "NONE",
+            "passed": false
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C04-reread-refreshes",
+        "expected": "FRESH",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "STALE_EXTERNAL",
+            "observed": "NO_SIGNAL"
+          },
+          {
+            "expected": "FRESH",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "STALE_EXTERNAL",
+            "observed": "NONE",
+            "passed": false
+          },
+          {
+            "event": "UserPromptSubmit",
+            "expected": "NONE",
+            "observed": "NONE",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C05-missing-file",
+        "expected": "MISSING",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "MISSING",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "MISSING",
+            "observed": "NONE",
+            "passed": false
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C06-resume-detects-drift",
+        "expected": "STALE_EXTERNAL",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "STALE_EXTERNAL",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "SessionStart",
+            "expected": "STALE_EXTERNAL",
+            "observed": "NONE",
+            "passed": false
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C07-compaction-persists-metadata",
+        "expected": "FRESH",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "FRESH",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "SessionStart",
+            "expected": "FRESH",
+            "observed": "NONE",
+            "passed": false
+          }
+        ],
+        "metadataChecks": [
+          {
+            "expected": "snapshotHash and readAt preserved",
+            "observed": "NOT_PRESERVED",
+            "passed": false
+          }
+        ],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      },
+      {
+        "id": "C08-untracked-is-unknown",
+        "expected": "UNKNOWN",
+        "observed": "NO_SIGNAL",
+        "checkpoints": [
+          {
+            "expected": "UNKNOWN",
+            "observed": "NO_SIGNAL"
+          }
+        ],
+        "signals": [],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0
+        },
+        "passed": false
+      }
+    ],
+    "outcome": {
+      "arm": "stock/no-plugin",
+      "taskOutcome": true,
+      "userModificationPreserved": false,
+      "taskSuccess": false,
+      "rereadBeforeEdit": false,
+      "unsafeStaleEdit": true,
+      "staleSignalObserved": false,
+      "guardBlocked": false,
+      "finalSha256": "702932edf37f5df5dfb441e5580783f15196aaf64f75a9f7755bb686c54c7042"
+    },
+    "guardMatrix": {
+      "cases": [
+        {
+          "id": "stale-external-core",
+          "level": "core",
+          "expectedBlocked": false,
+          "blocked": false,
+          "states": [],
+          "passed": true
+        },
+        {
+          "id": "missing-core",
+          "level": "core",
+          "expectedBlocked": false,
+          "blocked": false,
+          "states": [],
+          "passed": true
+        },
+        {
+          "id": "multi-target-core",
+          "level": "core",
+          "expectedBlocked": false,
+          "blocked": false,
+          "states": [],
+          "passed": true
+        },
+        {
+          "id": "apply-patch-handler",
+          "level": "handler",
+          "expectedBlocked": false,
+          "blocked": false,
+          "reasonContainsStale": false,
+          "passed": true
+        },
+        {
+          "id": "shell-copy-handler",
+          "level": "handler",
+          "expectedBlocked": false,
+          "blocked": false,
+          "reasonContainsStale": false,
+          "passed": true
+        },
+        {
+          "id": "shell-move-handler",
+          "level": "handler",
+          "expectedBlocked": false,
+          "blocked": false,
+          "reasonContainsStale": false,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "guardRate": 0
+    }
+  },
+  "freshread": {
+    "summary": {
+      "name": "freshread",
+      "requiredCasesPassed": 8,
+      "requiredCasesTotal": 8,
+      "exactAccuracy": 1,
+      "staleMissingRecall": 1,
+      "freshFalsePositiveRate": 0,
+      "unknownAsFreshCount": 0,
+      "preEditGuardRate": 1
+    },
+    "cases": [
+      {
+        "id": "C01-unchanged-read",
+        "expected": "FRESH",
+        "observed": "FRESH",
+        "checkpoints": [
+          {
+            "expected": "FRESH",
+            "observed": "FRESH"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "NONE",
+            "observed": "NONE",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 4,
+          "hashCalls": 1,
+          "bytesHashed": 28,
+          "stateReads": 3,
+          "stateWrites": 1,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C02-external-change",
+        "expected": "STALE_EXTERNAL",
+        "observed": "STALE_EXTERNAL",
+        "checkpoints": [
+          {
+            "expected": "STALE_EXTERNAL",
+            "observed": "STALE_EXTERNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "STALE_EXTERNAL",
+            "observed": "CONTEXT:STALE_EXTERNAL",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 5,
+          "hashCalls": 2,
+          "bytesHashed": 56,
+          "stateReads": 3,
+          "stateWrites": 2,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C03-self-change",
+        "expected": "STALE_SELF",
+        "observed": "STALE_SELF",
+        "checkpoints": [
+          {
+            "expected": "STALE_SELF",
+            "observed": "STALE_SELF"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "STALE_SELF",
+            "observed": "CONTEXT:STALE_SELF",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 8,
+          "hashCalls": 2,
+          "bytesHashed": 56,
+          "stateReads": 4,
+          "stateWrites": 2,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C04-reread-refreshes",
+        "expected": "FRESH",
+        "observed": "FRESH",
+        "checkpoints": [
+          {
+            "expected": "STALE_EXTERNAL",
+            "observed": "STALE_EXTERNAL"
+          },
+          {
+            "expected": "FRESH",
+            "observed": "FRESH"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "STALE_EXTERNAL",
+            "observed": "CONTEXT:STALE_EXTERNAL",
+            "passed": true
+          },
+          {
+            "event": "UserPromptSubmit",
+            "expected": "NONE",
+            "observed": "NONE",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 8,
+          "hashCalls": 2,
+          "bytesHashed": 56,
+          "stateReads": 6,
+          "stateWrites": 3,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C05-missing-file",
+        "expected": "MISSING",
+        "observed": "MISSING",
+        "checkpoints": [
+          {
+            "expected": "MISSING",
+            "observed": "MISSING"
+          }
+        ],
+        "signals": [
+          {
+            "event": "UserPromptSubmit",
+            "expected": "MISSING",
+            "observed": "CONTEXT:MISSING",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 4,
+          "hashCalls": 1,
+          "bytesHashed": 28,
+          "stateReads": 3,
+          "stateWrites": 2,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C06-resume-detects-drift",
+        "expected": "STALE_EXTERNAL",
+        "observed": "STALE_EXTERNAL",
+        "checkpoints": [
+          {
+            "expected": "STALE_EXTERNAL",
+            "observed": "STALE_EXTERNAL"
+          }
+        ],
+        "signals": [
+          {
+            "event": "SessionStart",
+            "expected": "STALE_EXTERNAL",
+            "observed": "CONTEXT:STALE_EXTERNAL",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 9,
+          "hashCalls": 3,
+          "bytesHashed": 84,
+          "stateReads": 4,
+          "stateWrites": 3,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C07-compaction-persists-metadata",
+        "expected": "FRESH",
+        "observed": "FRESH",
+        "checkpoints": [
+          {
+            "expected": "FRESH",
+            "observed": "FRESH"
+          }
+        ],
+        "signals": [
+          {
+            "event": "SessionStart",
+            "expected": "FRESH",
+            "observed": "CONTEXT:FRESH",
+            "passed": true
+          }
+        ],
+        "metadataChecks": [
+          {
+            "expected": "snapshotHash and readAt preserved",
+            "observed": "PRESERVED",
+            "passed": true
+          }
+        ],
+        "metrics": {
+          "statCalls": 10,
+          "hashCalls": 3,
+          "bytesHashed": 84,
+          "stateReads": 7,
+          "stateWrites": 1,
+          "lockRetries": 0
+        },
+        "passed": true
+      },
+      {
+        "id": "C08-untracked-is-unknown",
+        "expected": "UNKNOWN",
+        "observed": "UNKNOWN",
+        "checkpoints": [
+          {
+            "expected": "UNKNOWN",
+            "observed": "UNKNOWN"
+          }
+        ],
+        "signals": [],
+        "metadataChecks": [],
+        "metrics": {
+          "statCalls": 0,
+          "hashCalls": 0,
+          "bytesHashed": 0,
+          "stateReads": 1,
+          "stateWrites": 0,
+          "lockRetries": 0
+        },
+        "passed": true
+      }
+    ],
+    "outcome": {
+      "arm": "freshread",
+      "taskOutcome": true,
+      "userModificationPreserved": true,
+      "taskSuccess": true,
+      "rereadBeforeEdit": true,
+      "unsafeStaleEdit": false,
+      "staleSignalObserved": true,
+      "guardBlocked": true,
+      "finalSha256": "86458b096a4f44be9c059a9ceb596ae9c39f929e16062c758f9414badb3e9795"
+    },
+    "guard": {
+      "blocked": true,
+      "files": [],
+      "matrix": [
+        {
+          "id": "stale-external-core",
+          "level": "core",
+          "expectedBlocked": true,
+          "blocked": true,
+          "states": [
+            "STALE_EXTERNAL"
+          ],
+          "passed": true
+        },
+        {
+          "id": "missing-core",
+          "level": "core",
+          "expectedBlocked": true,
+          "blocked": true,
+          "states": [
+            "MISSING"
+          ],
+          "passed": true
+        },
+        {
+          "id": "multi-target-core",
+          "level": "core",
+          "expectedBlocked": true,
+          "blocked": true,
+          "states": [
+            "STALE_EXTERNAL"
+          ],
+          "passed": true
+        },
+        {
+          "id": "apply-patch-handler",
+          "level": "handler",
+          "expectedBlocked": true,
+          "blocked": true,
+          "reasonContainsStale": true,
+          "passed": true
+        },
+        {
+          "id": "shell-copy-handler",
+          "level": "handler",
+          "expectedBlocked": true,
+          "blocked": true,
+          "reasonContainsStale": true,
+          "passed": true
+        },
+        {
+          "id": "shell-move-handler",
+          "level": "handler",
+          "expectedBlocked": true,
+          "blocked": true,
+          "reasonContainsStale": true,
+          "passed": true
+        }
+      ]
+    },
+    "guardMatrix": {
+      "cases": [
+        {
+          "id": "stale-external-core",
+          "level": "core",
+          "expectedBlocked": true,
+          "blocked": true,
+          "states": [
+            "STALE_EXTERNAL"
+          ],
+          "passed": true
+        },
+        {
+          "id": "missing-core",
+          "level": "core",
+          "expectedBlocked": true,
+          "blocked": true,
+          "states": [
+            "MISSING"
+          ],
+          "passed": true
+        },
+        {
+          "id": "multi-target-core",
+          "level": "core",
+          "expectedBlocked": true,
+          "blocked": true,
+          "states": [
+            "STALE_EXTERNAL"
+          ],
+          "passed": true
+        },
+        {
+          "id": "apply-patch-handler",
+          "level": "handler",
+          "expectedBlocked": true,
+          "blocked": true,
+          "reasonContainsStale": true,
+          "passed": true
+        },
+        {
+          "id": "shell-copy-handler",
+          "level": "handler",
+          "expectedBlocked": true,
+          "blocked": true,
+          "reasonContainsStale": true,
+          "passed": true
+        },
+        {
+          "id": "shell-move-handler",
+          "level": "handler",
+          "expectedBlocked": true,
+          "blocked": true,
+          "reasonContainsStale": true,
+          "passed": true
+        }
+      ],
+      "passed": true,
+      "guardRate": 1
+    },
+    "handlerProtocol": {
+      "evidenceLevel": "synthetic-handler",
+      "cases": [
+        {
+          "id": "user-prompt-stale-signal",
+          "expected": "STALE_EXTERNAL",
+          "observed": "CONTEXT",
+          "passed": true
+        },
+        {
+          "id": "resume-stale-signal",
+          "expected": "STALE_EXTERNAL",
+          "observed": "CONTEXT",
+          "passed": true
+        },
+        {
+          "id": "compact-fresh-metadata-signal",
+          "expected": "FRESH",
+          "observed": "CONTEXT",
+          "passed": true
+        },
+        {
+          "id": "observed-pre-post-read-protocol",
+          "expected": "FRESH",
+          "observed": "FRESH",
+          "executionStatus": 0,
+          "postWarning": false,
+          "commandPreserved": true,
+          "passed": true
+        },
+        {
+          "id": "hooks-config-contract",
+          "expected": "valid six-boundary config",
+          "observed": "VALID",
+          "detail": null,
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "security": {
+      "cases": [
+        {
+          "id": "failed-read-never-fresh",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN",
+          "passed": true
+        },
+        {
+          "id": "read-posttool-race-never-fresh",
+          "expected": "UNKNOWN (never FRESH)",
+          "observed": "UNKNOWN",
+          "warningObserved": true,
+          "warningNamesRisk": true,
+          "passed": true
+        },
+        {
+          "id": "corrupt-state-fails-closed",
+          "expected": "DENY",
+          "observed": "DENY",
+          "passed": true
+        },
+        {
+          "id": "outside-workspace-never-tracked-fresh",
+          "expected": "UNKNOWN",
+          "observed": "UNKNOWN",
+          "passed": true
+        },
+        {
+          "id": "state-does-not-store-source-content",
+          "expected": "NO_SOURCE_BODY",
+          "observed": "NO_SOURCE_BODY",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "performance": {
+      "seededFiles": 100,
+      "trackedFiles": 100,
+      "iterations": 20,
+      "p50Ms": 26.934999999999945,
+      "p95Ms": 32.395500000000084,
+      "p99Ms": 34.2195999999999,
+      "unchangedCheckpointHashCalls": 0,
+      "statCalls": 2399,
+      "bytesHashed": 2090,
+      "readPhaseDurationMs": 878.8247000000001,
+      "nthReadMs": 9.82770000000005,
+      "nearNthReadSampleCount": 10,
+      "nearNthReadP95Ms": 11.591900000000123,
+      "readPhaseStatCalls": 299,
+      "readPhaseHashCalls": 100,
+      "readPhaseBytesHashed": 2090,
+      "readPhaseStateReads": 100,
+      "readPhaseStateWrites": 100,
+      "populatedHookSpawn": {
+        "enabled": true,
+        "iterations": 8,
+        "p50Ms": 726.2474000000002,
+        "p95Ms": 764.3266999999978,
+        "p99Ms": 764.3266999999978,
+        "failures": []
+      },
+      "cases": {
+        "100": {
+          "seededFiles": 100,
+          "trackedFiles": 100,
+          "iterations": 20,
+          "p50Ms": 26.934999999999945,
+          "p95Ms": 32.395500000000084,
+          "p99Ms": 34.2195999999999,
+          "unchangedCheckpointHashCalls": 0,
+          "statCalls": 2399,
+          "bytesHashed": 2090,
+          "readPhaseDurationMs": 878.8247000000001,
+          "nthReadMs": 9.82770000000005,
+          "nearNthReadSampleCount": 10,
+          "nearNthReadP95Ms": 11.591900000000123,
+          "readPhaseStatCalls": 299,
+          "readPhaseHashCalls": 100,
+          "readPhaseBytesHashed": 2090,
+          "readPhaseStateReads": 100,
+          "readPhaseStateWrites": 100,
+          "populatedHookSpawn": null
+        },
+        "1000": {
+          "seededFiles": 1000,
+          "trackedFiles": 1000,
+          "iterations": 8,
+          "p50Ms": 233.58910000000105,
+          "p95Ms": 254.41349999999875,
+          "p99Ms": 254.41349999999875,
+          "unchangedCheckpointHashCalls": 0,
+          "statCalls": 11999,
+          "bytesHashed": 21890,
+          "readPhaseDurationMs": 27353.4864,
+          "nthReadMs": 47.79620000000068,
+          "nearNthReadSampleCount": 10,
+          "nearNthReadP95Ms": 49.00080000000162,
+          "readPhaseStatCalls": 2999,
+          "readPhaseHashCalls": 1000,
+          "readPhaseBytesHashed": 21890,
+          "readPhaseStateReads": 1000,
+          "readPhaseStateWrites": 1000,
+          "populatedHookSpawn": {
+            "fileCount": 1000,
+            "order": "interleaved-and-alternating",
+            "baseline": {
+              "enabled": false,
+              "iterations": 8,
+              "p50Ms": 444.7778999999937,
+              "p95Ms": 492.32440000000497,
+              "p99Ms": 492.32440000000497,
+              "failures": []
+            },
+            "freshread": {
+              "enabled": true,
+              "iterations": 8,
+              "p50Ms": 726.2474000000002,
+              "p95Ms": 764.3266999999978,
+              "p99Ms": 764.3266999999978,
+              "failures": []
+            }
+          }
+        }
+      },
+      "coldHookSpawn": {
+        "enabled": true,
+        "iterations": 20,
+        "p50Ms": 443.45010000000184,
+        "p95Ms": 466.52449999999953,
+        "p99Ms": 467.78570000000036,
+        "failures": []
+      },
+      "readGrowth": {
+        "nthReadMs": 47.79620000000068,
+        "nearNthReadP95Ms": 49.00080000000162,
+        "nearNthReadSampleCount": 10,
+        "readPhaseDurationMs": 27353.4864,
+        "readPhaseStatCalls": 2999,
+        "readPhaseHashCalls": 1000,
+        "readPhaseStateReads": 1000,
+        "readPhaseStateWrites": 1000
+      }
+    },
+    "performanceBaseline": {
+      "seededFiles": 100,
+      "trackedFiles": 100,
+      "iterations": 20,
+      "p50Ms": 6.4090000000001055,
+      "p95Ms": 7.460699999999974,
+      "p99Ms": 7.8008000000002085,
+      "unchangedCheckpointHashCalls": 0,
+      "statCalls": 2100,
+      "bytesHashed": 0,
+      "readPhaseDurationMs": 0.19929999999999382,
+      "nthReadMs": 0.0013000000000147338,
+      "nearNthReadSampleCount": 10,
+      "nearNthReadP95Ms": 0.003400000000056025,
+      "readPhaseStatCalls": 0,
+      "readPhaseHashCalls": 0,
+      "readPhaseBytesHashed": 0,
+      "readPhaseStateReads": 0,
+      "readPhaseStateWrites": 0,
+      "populatedHookSpawn": {
+        "enabled": false,
+        "iterations": 8,
+        "p50Ms": 444.7778999999937,
+        "p95Ms": 492.32440000000497,
+        "p99Ms": 492.32440000000497,
+        "failures": []
+      },
+      "cases": {
+        "100": {
+          "seededFiles": 100,
+          "trackedFiles": 100,
+          "iterations": 20,
+          "p50Ms": 6.4090000000001055,
+          "p95Ms": 7.460699999999974,
+          "p99Ms": 7.8008000000002085,
+          "unchangedCheckpointHashCalls": 0,
+          "statCalls": 2100,
+          "bytesHashed": 0,
+          "readPhaseDurationMs": 0.19929999999999382,
+          "nthReadMs": 0.0013000000000147338,
+          "nearNthReadSampleCount": 10,
+          "nearNthReadP95Ms": 0.003400000000056025,
+          "readPhaseStatCalls": 0,
+          "readPhaseHashCalls": 0,
+          "readPhaseBytesHashed": 0,
+          "readPhaseStateReads": 0,
+          "readPhaseStateWrites": 0,
+          "populatedHookSpawn": null
+        },
+        "1000": {
+          "seededFiles": 1000,
+          "trackedFiles": 1000,
+          "iterations": 8,
+          "p50Ms": 69.24219999999968,
+          "p95Ms": 74.8406,
+          "p99Ms": 74.8406,
+          "unchangedCheckpointHashCalls": 0,
+          "statCalls": 9000,
+          "bytesHashed": 0,
+          "readPhaseDurationMs": 1.9495999999999185,
+          "nthReadMs": 0.0018000000000029104,
+          "nearNthReadSampleCount": 10,
+          "nearNthReadP95Ms": 0.003000000000156433,
+          "readPhaseStatCalls": 0,
+          "readPhaseHashCalls": 0,
+          "readPhaseBytesHashed": 0,
+          "readPhaseStateReads": 0,
+          "readPhaseStateWrites": 0,
+          "populatedHookSpawn": null
+        }
+      },
+      "coldHookSpawn": {
+        "enabled": false,
+        "iterations": 20,
+        "p50Ms": 442.36359999999695,
+        "p95Ms": 468.659900000006,
+        "p99Ms": 599.8332000000009,
+        "failures": []
+      },
+      "readGrowth": {
+        "nthReadMs": 0.0018000000000029104,
+        "nearNthReadP95Ms": 0.003000000000156433,
+        "readPhaseDurationMs": 1.9495999999999185,
+        "readPhaseStatCalls": 0
+      }
+    },
+    "performanceComparison": {
+      "cases": {
+        "100": {
+          "p95DeltaMs": 24.93480000000011,
+          "p95BudgetMs": 50,
+          "p95AbsoluteBudgetMs": 50,
+          "p95DeltaBudgetMs": 30,
+          "absolutePassed": true,
+          "deltaPassed": true,
+          "passed": true,
+          "trackedWorkloadMatched": true,
+          "unchangedCheckpointHashPassed": true
+        },
+        "1000": {
+          "p95DeltaMs": 179.57289999999875,
+          "p95BudgetMs": 400,
+          "p95AbsoluteBudgetMs": 400,
+          "p95DeltaBudgetMs": 300,
+          "absolutePassed": true,
+          "deltaPassed": true,
+          "passed": true,
+          "trackedWorkloadMatched": true,
+          "unchangedCheckpointHashPassed": true
+        }
+      },
+      "readGrowth": {
+        "required": true,
+        "status": "RUN",
+        "key": "1000",
+        "files": 1000,
+        "baseline": {
+          "nthReadMs": 0.0018000000000029104,
+          "nearNthReadP95Ms": 0.003000000000156433,
+          "readPhaseDurationMs": 1.9495999999999185,
+          "readPhaseStatCalls": 0
+        },
+        "freshread": {
+          "nthReadMs": 47.79620000000068,
+          "nearNthReadP95Ms": 49.00080000000162,
+          "nearNthReadSampleCount": 10,
+          "readPhaseDurationMs": 27353.4864,
+          "readPhaseStatCalls": 2999,
+          "readPhaseHashCalls": 1000,
+          "readPhaseStateReads": 1000,
+          "readPhaseStateWrites": 1000
+        },
+        "nthReadLatency": {
+          "p95DeltaMs": 47.79440000000068,
+          "p95BudgetMs": 150,
+          "p95AbsoluteBudgetMs": 150,
+          "p95DeltaBudgetMs": 125,
+          "absolutePassed": true,
+          "deltaPassed": true,
+          "passed": true
+        },
+        "nearNthReadLatency": {
+          "p95DeltaMs": 48.99780000000146,
+          "p95BudgetMs": 150,
+          "p95AbsoluteBudgetMs": 150,
+          "p95DeltaBudgetMs": 125,
+          "absolutePassed": true,
+          "deltaPassed": true,
+          "passed": true
+        },
+        "maxReadPhaseStatCalls": 3000,
+        "maxReadStatCallsPerFile": 3,
+        "linearWorkPassed": true,
+        "passed": true
+      },
+      "coldHookSpawn": {
+        "p95DeltaMs": 17.51469999999972,
+        "p95BudgetMs": 500,
+        "p95AbsoluteBudgetMs": 500,
+        "p95DeltaBudgetMs": 100,
+        "deltaMethod": "paired-freshread-minus-baseline",
+        "pairedDeltaP50Ms": 2.7603000000017346,
+        "pairedDeltaP95Ms": 17.51469999999972,
+        "pairedDeltaP99Ms": 22.67630000000645,
+        "absolutePassed": true,
+        "deltaPassed": true,
+        "passed": true,
+        "order": "paired-interleaved-and-alternating-ab-ba",
+        "iterationsPerArm": 20,
+        "baseline": {
+          "enabled": false,
+          "iterations": 20,
+          "p50Ms": 442.36359999999695,
+          "p95Ms": 468.659900000006,
+          "p99Ms": 599.8332000000009,
+          "failures": []
+        },
+        "freshread": {
+          "enabled": true,
+          "iterations": 20,
+          "p50Ms": 443.45010000000184,
+          "p95Ms": 466.52449999999953,
+          "p99Ms": 467.78570000000036,
+          "failures": []
+        },
+        "pairs": [
+          {
+            "pairIndex": 0,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 448.3842000000004,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 441.11589999999705,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -7.268300000003364
+          },
+          {
+            "pairIndex": 1,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 442.6814000000013,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 443.2646999999997,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 0.5832999999984168
+          },
+          {
+            "pairIndex": 2,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 460.78629999999976,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 466.52449999999953,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 5.738199999999779
+          },
+          {
+            "pairIndex": 3,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 437.8946999999971,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 455.4093999999968,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 17.51469999999972
+          },
+          {
+            "pairIndex": 4,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 439.4769000000015,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 444.4582999999984,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 4.981399999996938
+          },
+          {
+            "pairIndex": 5,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 430.28839999999764,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 452.9647000000041,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 22.67630000000645
+          },
+          {
+            "pairIndex": 6,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 440.49670000000333,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 431.99810000000434,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -8.498599999998987
+          },
+          {
+            "pairIndex": 7,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 442.92059999999765,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 445.6808999999994,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 2.7603000000017346
+          },
+          {
+            "pairIndex": 8,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 435.3484000000026,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 440.4748000000036,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 5.126400000001013
+          },
+          {
+            "pairIndex": 9,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 434.26380000000063,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 439.4864000000016,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 5.222600000000966
+          },
+          {
+            "pairIndex": 10,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 439.18449999999575,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 437.49090000000433,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -1.6935999999914202
+          },
+          {
+            "pairIndex": 11,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 442.36359999999695,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 434.27760000000126,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -8.085999999995693
+          },
+          {
+            "pairIndex": 12,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 447.96199999999953,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 440.97290000000066,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -6.989099999998871
+          },
+          {
+            "pairIndex": 13,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 446.3839999999982,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 451.33520000000135,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 4.951200000003155
+          },
+          {
+            "pairIndex": 14,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 442.7876000000033,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 440.6025000000009,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -2.1851000000024214
+          },
+          {
+            "pairIndex": 15,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 439.53549999999814,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 444.2838000000047,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 4.748300000006566
+          },
+          {
+            "pairIndex": 16,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 447.9823999999935,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 457.780700000003,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 9.798300000009476
+          },
+          {
+            "pairIndex": 17,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 599.8332000000009,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 467.78570000000036,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -132.04750000000058
+          },
+          {
+            "pairIndex": 18,
+            "order": [
+              "baseline",
+              "freshread"
+            ],
+            "baseline": {
+              "durationMs": 468.659900000006,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 453.2422000000006,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": -15.417700000005425
+          },
+          {
+            "pairIndex": 19,
+            "order": [
+              "freshread",
+              "baseline"
+            ],
+            "baseline": {
+              "durationMs": 440.5260000000053,
+              "status": 0,
+              "signal": null
+            },
+            "freshread": {
+              "durationMs": 443.45010000000184,
+              "status": 0,
+              "signal": null
+            },
+            "deltaMs": 2.9240999999965425
+          }
+        ],
+        "required": true,
+        "status": "RUN"
+      },
+      "populatedHookSpawn": {
+        "p95DeltaMs": 272.00229999999283,
+        "p95BudgetMs": 900,
+        "p95AbsoluteBudgetMs": 900,
+        "p95DeltaBudgetMs": 400,
+        "absolutePassed": true,
+        "deltaPassed": true,
+        "passed": true,
+        "fileCount": 1000,
+        "order": "interleaved-and-alternating",
+        "baseline": {
+          "enabled": false,
+          "iterations": 8,
+          "p50Ms": 444.7778999999937,
+          "p95Ms": 492.32440000000497,
+          "p99Ms": 492.32440000000497,
+          "failures": []
+        },
+        "freshread": {
+          "enabled": true,
+          "iterations": 8,
+          "p50Ms": 726.2474000000002,
+          "p95Ms": 764.3266999999978,
+          "p99Ms": 764.3266999999978,
+          "failures": []
+        },
+        "required": true,
+        "status": "RUN"
+      }
+    }
+  },
+  "outcomeComparison": {
+    "taskOutcomeDelta": 0,
+    "userModificationPreservationDelta": 1,
+    "unsafeStaleEditDelta": -1
+  },
+  "launchGate": {
+    "scope": "deterministic + synthetic-handler + security + full local-performance",
+    "profile": "full-release",
+    "passed": true,
+    "deterministicEligible": true,
+    "releaseEligible": false,
+    "gates": {
+      "deterministic": {
+        "passed": true,
+        "evidence": {
+          "scenarioIntegrity": {
+            "expected": [
+              "C01-unchanged-read",
+              "C02-external-change",
+              "C03-self-change",
+              "C04-reread-refreshes",
+              "C05-missing-file",
+              "C06-resume-detects-drift",
+              "C07-compaction-persists-metadata",
+              "C08-untracked-is-unknown"
+            ],
+            "actual": [
+              "C01-unchanged-read",
+              "C02-external-change",
+              "C03-self-change",
+              "C04-reread-refreshes",
+              "C05-missing-file",
+              "C06-resume-detects-drift",
+              "C07-compaction-persists-metadata",
+              "C08-untracked-is-unknown"
+            ],
+            "passed": true
+          },
+          "requiredCasesPassed": 8,
+          "outcomeComparison": {
+            "taskOutcomeDelta": 0,
+            "userModificationPreservationDelta": 1,
+            "unsafeStaleEditDelta": -1
+          }
+        },
+        "violations": []
+      },
+      "handler": {
+        "passed": true,
+        "evidence": {
+          "guardMatrix": {
+            "cases": [
+              {
+                "id": "stale-external-core",
+                "level": "core",
+                "expectedBlocked": true,
+                "blocked": true,
+                "states": [
+                  "STALE_EXTERNAL"
+                ],
+                "passed": true
+              },
+              {
+                "id": "missing-core",
+                "level": "core",
+                "expectedBlocked": true,
+                "blocked": true,
+                "states": [
+                  "MISSING"
+                ],
+                "passed": true
+              },
+              {
+                "id": "multi-target-core",
+                "level": "core",
+                "expectedBlocked": true,
+                "blocked": true,
+                "states": [
+                  "STALE_EXTERNAL"
+                ],
+                "passed": true
+              },
+              {
+                "id": "apply-patch-handler",
+                "level": "handler",
+                "expectedBlocked": true,
+                "blocked": true,
+                "reasonContainsStale": true,
+                "passed": true
+              },
+              {
+                "id": "shell-copy-handler",
+                "level": "handler",
+                "expectedBlocked": true,
+                "blocked": true,
+                "reasonContainsStale": true,
+                "passed": true
+              },
+              {
+                "id": "shell-move-handler",
+                "level": "handler",
+                "expectedBlocked": true,
+                "blocked": true,
+                "reasonContainsStale": true,
+                "passed": true
+              }
+            ],
+            "passed": true,
+            "guardRate": 1
+          },
+          "protocol": {
+            "evidenceLevel": "synthetic-handler",
+            "cases": [
+              {
+                "id": "user-prompt-stale-signal",
+                "expected": "STALE_EXTERNAL",
+                "observed": "CONTEXT",
+                "passed": true
+              },
+              {
+                "id": "resume-stale-signal",
+                "expected": "STALE_EXTERNAL",
+                "observed": "CONTEXT",
+                "passed": true
+              },
+              {
+                "id": "compact-fresh-metadata-signal",
+                "expected": "FRESH",
+                "observed": "CONTEXT",
+                "passed": true
+              },
+              {
+                "id": "observed-pre-post-read-protocol",
+                "expected": "FRESH",
+                "observed": "FRESH",
+                "executionStatus": 0,
+                "postWarning": false,
+                "commandPreserved": true,
+                "passed": true
+              },
+              {
+                "id": "hooks-config-contract",
+                "expected": "valid six-boundary config",
+                "observed": "VALID",
+                "detail": null,
+                "passed": true
+              }
+            ],
+            "passed": true
+          }
+        },
+        "violations": []
+      },
+      "security": {
+        "passed": true,
+        "evidence": {
+          "cases": [
+            {
+              "id": "failed-read-never-fresh",
+              "expected": "UNKNOWN",
+              "observed": "UNKNOWN",
+              "passed": true
+            },
+            {
+              "id": "read-posttool-race-never-fresh",
+              "expected": "UNKNOWN (never FRESH)",
+              "observed": "UNKNOWN",
+              "warningObserved": true,
+              "warningNamesRisk": true,
+              "passed": true
+            },
+            {
+              "id": "corrupt-state-fails-closed",
+              "expected": "DENY",
+              "observed": "DENY",
+              "passed": true
+            },
+            {
+              "id": "outside-workspace-never-tracked-fresh",
+              "expected": "UNKNOWN",
+              "observed": "UNKNOWN",
+              "passed": true
+            },
+            {
+              "id": "state-does-not-store-source-content",
+              "expected": "NO_SOURCE_BODY",
+              "observed": "NO_SOURCE_BODY",
+              "passed": true
+            }
+          ],
+          "passed": true
+        },
+        "violations": []
+      },
+      "performance": {
+        "passed": true,
+        "evidence": {
+          "profile": "full-release",
+          "primaryKey": "100",
+          "baseline": {
+            "100": {
+              "seededFiles": 100,
+              "trackedFiles": 100,
+              "iterations": 20,
+              "p50Ms": 6.4090000000001055,
+              "p95Ms": 7.460699999999974,
+              "p99Ms": 7.8008000000002085,
+              "unchangedCheckpointHashCalls": 0,
+              "statCalls": 2100,
+              "bytesHashed": 0,
+              "readPhaseDurationMs": 0.19929999999999382,
+              "nthReadMs": 0.0013000000000147338,
+              "nearNthReadSampleCount": 10,
+              "nearNthReadP95Ms": 0.003400000000056025,
+              "readPhaseStatCalls": 0,
+              "readPhaseHashCalls": 0,
+              "readPhaseBytesHashed": 0,
+              "readPhaseStateReads": 0,
+              "readPhaseStateWrites": 0,
+              "populatedHookSpawn": null
+            },
+            "1000": {
+              "seededFiles": 1000,
+              "trackedFiles": 1000,
+              "iterations": 8,
+              "p50Ms": 69.24219999999968,
+              "p95Ms": 74.8406,
+              "p99Ms": 74.8406,
+              "unchangedCheckpointHashCalls": 0,
+              "statCalls": 9000,
+              "bytesHashed": 0,
+              "readPhaseDurationMs": 1.9495999999999185,
+              "nthReadMs": 0.0018000000000029104,
+              "nearNthReadSampleCount": 10,
+              "nearNthReadP95Ms": 0.003000000000156433,
+              "readPhaseStatCalls": 0,
+              "readPhaseHashCalls": 0,
+              "readPhaseBytesHashed": 0,
+              "readPhaseStateReads": 0,
+              "readPhaseStateWrites": 0,
+              "populatedHookSpawn": null
+            }
+          },
+          "freshread": {
+            "100": {
+              "seededFiles": 100,
+              "trackedFiles": 100,
+              "iterations": 20,
+              "p50Ms": 26.934999999999945,
+              "p95Ms": 32.395500000000084,
+              "p99Ms": 34.2195999999999,
+              "unchangedCheckpointHashCalls": 0,
+              "statCalls": 2399,
+              "bytesHashed": 2090,
+              "readPhaseDurationMs": 878.8247000000001,
+              "nthReadMs": 9.82770000000005,
+              "nearNthReadSampleCount": 10,
+              "nearNthReadP95Ms": 11.591900000000123,
+              "readPhaseStatCalls": 299,
+              "readPhaseHashCalls": 100,
+              "readPhaseBytesHashed": 2090,
+              "readPhaseStateReads": 100,
+              "readPhaseStateWrites": 100,
+              "populatedHookSpawn": null
+            },
+            "1000": {
+              "seededFiles": 1000,
+              "trackedFiles": 1000,
+              "iterations": 8,
+              "p50Ms": 233.58910000000105,
+              "p95Ms": 254.41349999999875,
+              "p99Ms": 254.41349999999875,
+              "unchangedCheckpointHashCalls": 0,
+              "statCalls": 11999,
+              "bytesHashed": 21890,
+              "readPhaseDurationMs": 27353.4864,
+              "nthReadMs": 47.79620000000068,
+              "nearNthReadSampleCount": 10,
+              "nearNthReadP95Ms": 49.00080000000162,
+              "readPhaseStatCalls": 2999,
+              "readPhaseHashCalls": 1000,
+              "readPhaseBytesHashed": 21890,
+              "readPhaseStateReads": 1000,
+              "readPhaseStateWrites": 1000,
+              "populatedHookSpawn": {
+                "fileCount": 1000,
+                "order": "interleaved-and-alternating",
+                "baseline": {
+                  "enabled": false,
+                  "iterations": 8,
+                  "p50Ms": 444.7778999999937,
+                  "p95Ms": 492.32440000000497,
+                  "p99Ms": 492.32440000000497,
+                  "failures": []
+                },
+                "freshread": {
+                  "enabled": true,
+                  "iterations": 8,
+                  "p50Ms": 726.2474000000002,
+                  "p95Ms": 764.3266999999978,
+                  "p99Ms": 764.3266999999978,
+                  "failures": []
+                }
+              }
+            }
+          },
+          "comparisons": {
+            "100": {
+              "p95DeltaMs": 24.93480000000011,
+              "p95BudgetMs": 50,
+              "p95AbsoluteBudgetMs": 50,
+              "p95DeltaBudgetMs": 30,
+              "absolutePassed": true,
+              "deltaPassed": true,
+              "passed": true,
+              "trackedWorkloadMatched": true,
+              "unchangedCheckpointHashPassed": true
+            },
+            "1000": {
+              "p95DeltaMs": 179.57289999999875,
+              "p95BudgetMs": 400,
+              "p95AbsoluteBudgetMs": 400,
+              "p95DeltaBudgetMs": 300,
+              "absolutePassed": true,
+              "deltaPassed": true,
+              "passed": true,
+              "trackedWorkloadMatched": true,
+              "unchangedCheckpointHashPassed": true
+            }
+          },
+          "readGrowth": {
+            "required": true,
+            "status": "RUN",
+            "key": "1000",
+            "files": 1000,
+            "baseline": {
+              "nthReadMs": 0.0018000000000029104,
+              "nearNthReadP95Ms": 0.003000000000156433,
+              "readPhaseDurationMs": 1.9495999999999185,
+              "readPhaseStatCalls": 0
+            },
+            "freshread": {
+              "nthReadMs": 47.79620000000068,
+              "nearNthReadP95Ms": 49.00080000000162,
+              "nearNthReadSampleCount": 10,
+              "readPhaseDurationMs": 27353.4864,
+              "readPhaseStatCalls": 2999,
+              "readPhaseHashCalls": 1000,
+              "readPhaseStateReads": 1000,
+              "readPhaseStateWrites": 1000
+            },
+            "nthReadLatency": {
+              "p95DeltaMs": 47.79440000000068,
+              "p95BudgetMs": 150,
+              "p95AbsoluteBudgetMs": 150,
+              "p95DeltaBudgetMs": 125,
+              "absolutePassed": true,
+              "deltaPassed": true,
+              "passed": true
+            },
+            "nearNthReadLatency": {
+              "p95DeltaMs": 48.99780000000146,
+              "p95BudgetMs": 150,
+              "p95AbsoluteBudgetMs": 150,
+              "p95DeltaBudgetMs": 125,
+              "absolutePassed": true,
+              "deltaPassed": true,
+              "passed": true
+            },
+            "maxReadPhaseStatCalls": 3000,
+            "maxReadStatCallsPerFile": 3,
+            "linearWorkPassed": true,
+            "passed": true
+          },
+          "coldHookSpawn": {
+            "p95DeltaMs": 17.51469999999972,
+            "p95BudgetMs": 500,
+            "p95AbsoluteBudgetMs": 500,
+            "p95DeltaBudgetMs": 100,
+            "deltaMethod": "paired-freshread-minus-baseline",
+            "pairedDeltaP50Ms": 2.7603000000017346,
+            "pairedDeltaP95Ms": 17.51469999999972,
+            "pairedDeltaP99Ms": 22.67630000000645,
+            "absolutePassed": true,
+            "deltaPassed": true,
+            "passed": true,
+            "order": "paired-interleaved-and-alternating-ab-ba",
+            "iterationsPerArm": 20,
+            "baseline": {
+              "enabled": false,
+              "iterations": 20,
+              "p50Ms": 442.36359999999695,
+              "p95Ms": 468.659900000006,
+              "p99Ms": 599.8332000000009,
+              "failures": []
+            },
+            "freshread": {
+              "enabled": true,
+              "iterations": 20,
+              "p50Ms": 443.45010000000184,
+              "p95Ms": 466.52449999999953,
+              "p99Ms": 467.78570000000036,
+              "failures": []
+            },
+            "pairs": [
+              {
+                "pairIndex": 0,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 448.3842000000004,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 441.11589999999705,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -7.268300000003364
+              },
+              {
+                "pairIndex": 1,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 442.6814000000013,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 443.2646999999997,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 0.5832999999984168
+              },
+              {
+                "pairIndex": 2,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 460.78629999999976,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 466.52449999999953,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 5.738199999999779
+              },
+              {
+                "pairIndex": 3,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 437.8946999999971,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 455.4093999999968,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 17.51469999999972
+              },
+              {
+                "pairIndex": 4,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 439.4769000000015,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 444.4582999999984,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 4.981399999996938
+              },
+              {
+                "pairIndex": 5,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 430.28839999999764,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 452.9647000000041,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 22.67630000000645
+              },
+              {
+                "pairIndex": 6,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 440.49670000000333,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 431.99810000000434,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -8.498599999998987
+              },
+              {
+                "pairIndex": 7,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 442.92059999999765,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 445.6808999999994,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 2.7603000000017346
+              },
+              {
+                "pairIndex": 8,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 435.3484000000026,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 440.4748000000036,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 5.126400000001013
+              },
+              {
+                "pairIndex": 9,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 434.26380000000063,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 439.4864000000016,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 5.222600000000966
+              },
+              {
+                "pairIndex": 10,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 439.18449999999575,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 437.49090000000433,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -1.6935999999914202
+              },
+              {
+                "pairIndex": 11,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 442.36359999999695,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 434.27760000000126,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -8.085999999995693
+              },
+              {
+                "pairIndex": 12,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 447.96199999999953,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 440.97290000000066,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -6.989099999998871
+              },
+              {
+                "pairIndex": 13,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 446.3839999999982,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 451.33520000000135,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 4.951200000003155
+              },
+              {
+                "pairIndex": 14,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 442.7876000000033,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 440.6025000000009,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -2.1851000000024214
+              },
+              {
+                "pairIndex": 15,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 439.53549999999814,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 444.2838000000047,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 4.748300000006566
+              },
+              {
+                "pairIndex": 16,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 447.9823999999935,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 457.780700000003,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 9.798300000009476
+              },
+              {
+                "pairIndex": 17,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 599.8332000000009,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 467.78570000000036,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -132.04750000000058
+              },
+              {
+                "pairIndex": 18,
+                "order": [
+                  "baseline",
+                  "freshread"
+                ],
+                "baseline": {
+                  "durationMs": 468.659900000006,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 453.2422000000006,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": -15.417700000005425
+              },
+              {
+                "pairIndex": 19,
+                "order": [
+                  "freshread",
+                  "baseline"
+                ],
+                "baseline": {
+                  "durationMs": 440.5260000000053,
+                  "status": 0,
+                  "signal": null
+                },
+                "freshread": {
+                  "durationMs": 443.45010000000184,
+                  "status": 0,
+                  "signal": null
+                },
+                "deltaMs": 2.9240999999965425
+              }
+            ],
+            "required": true,
+            "status": "RUN"
+          },
+          "populatedHookSpawn": {
+            "p95DeltaMs": 272.00229999999283,
+            "p95BudgetMs": 900,
+            "p95AbsoluteBudgetMs": 900,
+            "p95DeltaBudgetMs": 400,
+            "absolutePassed": true,
+            "deltaPassed": true,
+            "passed": true,
+            "fileCount": 1000,
+            "order": "interleaved-and-alternating",
+            "baseline": {
+              "enabled": false,
+              "iterations": 8,
+              "p50Ms": 444.7778999999937,
+              "p95Ms": 492.32440000000497,
+              "p99Ms": 492.32440000000497,
+              "failures": []
+            },
+            "freshread": {
+              "enabled": true,
+              "iterations": 8,
+              "p50Ms": 726.2474000000002,
+              "p95Ms": 764.3266999999978,
+              "p99Ms": 764.3266999999978,
+              "failures": []
+            },
+            "required": true,
+            "status": "RUN"
+          },
+          "passed": true
+        },
+        "violations": []
+      },
+      "provenance": {
+        "passed": true,
+        "evidence": {
+          "algorithm": "SHA-256",
+          "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+          "fileCount": 32,
+          "excludes": [
+            "node_modules/**",
+            ".git/**",
+            "benchmarks/results/**"
+          ]
+        },
+        "violations": []
+      },
+      "liveLifecycle": {
+        "required": true,
+        "passed": null,
+        "status": "NOT_RUN",
+        "claim": "Live Codex lifecycle evidence is required for overall release eligibility and is not run by this deterministic benchmark."
+      }
+    },
+    "violations": []
+  }
+}

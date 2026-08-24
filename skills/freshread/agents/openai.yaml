@@ -1,0 +1,6 @@
+interface:
+  display_name: "FreshRead"
+  short_description: "Detect and guard stale file context"
+  default_prompt: "Use $freshread to inspect stale file context in this Codex session."
+policy:
+  allow_implicit_invocation: true

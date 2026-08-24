@@ -1,0 +1,803 @@
+{
+  "schemaVersion": 6,
+  "runId": "20260824061217937-e086e618829e98b4",
+  "generatedAt": "2026-08-24T06:17:12.416Z",
+  "status": "PASS",
+  "evidenceLevel": "live-codex-model-tool-hook",
+  "codex": {
+    "path": "<CODEX_BIN>",
+    "version": "codex-cli 0.149.0-alpha.4.1",
+    "sha256": "81cae94fbac1ba51713614347892d4895d66cc4b17c800f4259284616d009c6f",
+    "stableDuringRun": true
+  },
+  "sourceTree": {
+    "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+    "fileCount": 32
+  },
+  "installedPlugin": {
+    "marketplace": "personal",
+    "plugin": "freshread",
+    "version": "0.1.0+codex.20260824060943",
+    "cachePath": "<PLUGIN_CACHE>",
+    "cacheDigest": {
+      "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+      "fileCount": 32
+    },
+    "matchesSource": true,
+    "hookContractValid": true
+  },
+  "deterministicBenchmark": {
+    "schemaVersion": 3,
+    "generatedAt": "2026-08-24T06:10:24.032Z",
+    "artifactSha256": "e0a6d4f62183929f79f1d6624b6372921487beefb3db92fe81751805ad1dbcd6",
+    "sourceMatches": true,
+    "fullProfile": true,
+    "deterministicEligible": true,
+    "gatesPassed": true,
+    "passed": true
+  },
+  "provenance": {
+    "sourceStable": true,
+    "cacheStable": true,
+    "deterministicArtifactStable": true,
+    "codexBinaryStable": true,
+    "runtimeEquivalent": true,
+    "sourceAfter": {
+      "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+      "fileCount": 32
+    },
+    "cacheAfter": {
+      "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+      "fileCount": 32
+    }
+  },
+  "sandbox": "workspaceWrite (verified response)",
+  "protocol": "app-server-stdio",
+  "approvalPolicy": "never",
+  "threadPersistence": "ephemeral",
+  "hookTrust": "persisted exact installed hook hashes (verified trusted before thread start)",
+  "environmentPolicy": "minimal system (including trusted Windows program roots) + explicit OpenAI API auth and proxy variables; endpoint override variables are stripped; the baseline disables exactly six FreshRead hooks with a process-local config override; FRESHREAD_TEST_MODE=1 uses a per-arm audit nonce",
+  "remainingEnvironmentClaim": "Effective configured MCP servers are dynamically disabled and rebound by config/read before any thread; Apps MCP is disabled and any MCP runtime startup notification invalidates the arm; the selected built-in OpenAI provider and default endpoints are fail-closed. Other user configuration remains shared across both arms.",
+  "baseline": {
+    "arm": "baseline",
+    "enabled": false,
+    "passed": true,
+    "processStatus": 0,
+    "processSignal": null,
+    "processEvidence": {
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "truncatedInMemory": false
+      },
+      "protocolBytes": 67192
+    },
+    "protocol": {
+      "threadIdSha256": "0074b659d8ee11a23cb2a17691aa678273b0c6bac85ee1b18ad004ba3a061b52",
+      "turnIdSha256": "c3b7a8fa07f5c88836a71bbc032105cd0b4af05eb7ceb42d74c747850462ea11",
+      "initialize": {
+        "platformOs": "windows",
+        "platformFamily": "windows",
+        "codexHome": "<CODEX_HOME>",
+        "codexHomeMatches": true,
+        "userAgentSha256": "16b41463f2112c5579d2f80e30984796166f8fdc585796600b30ce4ca369605f"
+      },
+      "mcpPreflight": {
+        "passed": true,
+        "configReadBeforeThread": true,
+        "discoveredServerCount": 2,
+        "inventoryBindingSha256": "51274f864dbcbaebc5b14661abfb5d88b4e60e96ab17b87ddf48dd28632cd95e",
+        "initialize": {
+          "platformOs": "windows",
+          "platformFamily": "windows",
+          "codexHome": "<CODEX_HOME>",
+          "codexHomeMatches": true,
+          "userAgentSha256": "16b41463f2112c5579d2f80e30984796166f8fdc585796600b30ce4ca369605f"
+        },
+        "provider": {
+          "passed": true,
+          "model": "gpt-5.6-sol",
+          "modelProvider": "openai",
+          "selectedProviderCustomEntryAbsent": true,
+          "openaiBaseUrlAbsent": true,
+          "chatgptBaseUrlOfficialDefault": true,
+          "chatgptBaseUrlMode": "official-default",
+          "appsFeatureDisabled": true
+        },
+        "processStatus": 0,
+        "processSignal": null,
+        "process": {
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncatedInMemory": false
+          },
+          "protocolBytes": 42897
+        }
+      },
+      "mcpIsolation": {
+        "passed": true,
+        "discoveryBound": true,
+        "discoveredServerCount": 2,
+        "effectiveServerCount": 2,
+        "disabledServerCount": 2,
+        "provider": {
+          "passed": true,
+          "model": "gpt-5.6-sol",
+          "modelProvider": "openai",
+          "selectedProviderCustomEntryAbsent": true,
+          "openaiBaseUrlAbsent": true,
+          "chatgptBaseUrlOfficialDefault": true,
+          "chatgptBaseUrlMode": "official-default",
+          "appsFeatureDisabled": true
+        }
+      },
+      "threadRuntime": {
+        "cwd": "<WORKSPACE>",
+        "cwdMatches": true,
+        "ephemeral": true,
+        "approvalPolicy": "never",
+        "sandbox": {
+          "type": "workspaceWrite",
+          "workspaceWritable": true,
+          "writableRootMode": "implicit-primary-cwd",
+          "networkAccess": false
+        },
+        "runtimeRootCoversWorkspace": true,
+        "model": "gpt-5.6-sol",
+        "modelProvider": "openai",
+        "serviceTier": "default",
+        "reasoningEffort": "ultra",
+        "activePermissionProfileSha256": null
+      }
+    },
+    "hookDiscovery": {
+      "passed": true,
+      "workspace": "<WORKSPACE>",
+      "workspaceMatches": true,
+      "warningsCount": 0,
+      "errorsCount": 0,
+      "exactMetadata": true,
+      "hooks": [
+        {
+          "eventName": "postCompact",
+          "enabled": false,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "6151dd078304925950cb45ca5bb2110cf20f9d937a0100e3bf6ab9705532151b",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "67837496de9d56f4c74e28a5a8a318f4a85b3f0d0d4631174ab1f23054bf4314"
+        },
+        {
+          "eventName": "postToolUse",
+          "enabled": false,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "56fe624e058fc045ec9cac730ce7395fda1f6bab9aef2ee8fcfd7feebae65d87",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "5edbd6763565ccd5dd3a7c69e0982e48df3ebc21d0a51ee6a26f6401e0155a17"
+        },
+        {
+          "eventName": "preCompact",
+          "enabled": false,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "6151dd078304925950cb45ca5bb2110cf20f9d937a0100e3bf6ab9705532151b",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "6572211fab0afcd474ac09307a5aefdb6d7dd985da4431afbce1144dfcad6ea4"
+        },
+        {
+          "eventName": "preToolUse",
+          "enabled": false,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "dbe1cda07cdfb0410e9f6b476990e677aee641f02930657b4657aed117637477",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "1cddc5002450d9f3e2f0e8b3456df380e8fbc256727825e7241ec89c21154afd"
+        },
+        {
+          "eventName": "sessionStart",
+          "enabled": false,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "d5d5d43a493c0fa2e091a00a068dc5088586f307c0a249b36f3eacfc8088344c",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "8627550b6939a02a1dabc832f0325a285dd93ba1994b182c84673b12a4e45874"
+        },
+        {
+          "eventName": "userPromptSubmit",
+          "enabled": false,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": null,
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "60fc0d77ef249d0912821e2b99e70dd48eac167c746a67ee9a6d1e616948cef6"
+        }
+      ]
+    },
+    "hookExecution": {
+      "associationMethod": "exact per-process hook-state disable plus complete absence of target-turn hook lifecycle and audit evidence",
+      "lifecycleComplete": true,
+      "exactSequence": true,
+      "hookCountsExact": true,
+      "associationExact": true,
+      "timingExact": true,
+      "auditExact": true,
+      "foreignHookLifecycleEvents": 0,
+      "disabledLifecycleAbsent": true,
+      "disabledLifecycleEventCount": 0,
+      "exactDenial": false,
+      "preToolUse": 0,
+      "postToolUse": 0,
+      "blockedAttempt": null,
+      "runs": [],
+      "passed": true
+    },
+    "finalResponse": {
+      "passed": true,
+      "completedAgentMessageCount": 1,
+      "finalAnswerCount": 1,
+      "targetErrorNotificationCount": 4,
+      "targetRetriableTransportErrorNotificationCount": 4,
+      "targetTerminalErrorNotificationCount": 0,
+      "exactDone": true,
+      "terminalTextBytes": 4,
+      "terminalTextSha256": "283e91eb85d58ffc2ad922884b644c41b54140660f6d1fda3c403d543eedd839",
+      "terminalPhaseMode": "explicit-final",
+      "explicitFinalCompatible": true,
+      "beforeTurnCompleted": true
+    },
+    "mcpRuntime": {
+      "passed": true,
+      "startupStatusNotificationCount": 0,
+      "noRuntimeMcpStartupObserved": true
+    },
+    "benchmarkAudit": {
+      "passed": false,
+      "recordCount": 0,
+      "errorCode": "BENCHMARK_AUDIT_MISSING",
+      "nonceSha256": "d8e4ec7e5733db30eea4d6ef7933b6bfd7b795be2e2ade2d6f650d659b115980",
+      "rawToolIdsPersisted": false,
+      "rawCommandsPersisted": false,
+      "records": [],
+      "expectedMode": "absent-disabled-baseline",
+      "expectationPassed": true
+    },
+    "toolLedger": {
+      "targetActionCount": 3,
+      "commandExecutionCount": 3,
+      "expectedCommandExecutionCount": 3,
+      "extraActionTypes": [],
+      "foreignActionCount": 0,
+      "exact": true
+    },
+    "exactSequence": true,
+    "commandTrace": [
+      {
+        "index": 1,
+        "label": "read",
+        "expectedCommandSha256": "8813ad7deab0716c80ac82308349ce7d0047bd7a19f76ecdfc270542986eb3af",
+        "observedCommandSha256": "e008827f81a0281bb661c57629672f8ebfa26f23425587d8b7431b41321f9315",
+        "matchedVariant": 1,
+        "carrier": "powershell",
+        "cwdMatches": true,
+        "status": "completed",
+        "exitCode": 0,
+        "outputBytes": 13,
+        "outputSha256": "2cef44526a2c4737c7a780569b70db6ef664b5e84ef10446e86c49672884eeae",
+        "outputFreshReadBlocked": false,
+        "outputStaleExternal": false
+      },
+      {
+        "index": 2,
+        "label": "external-edit",
+        "expectedCommandSha256": "e8f343430008247ea7ab017c4e787dd835a5ceb87474598da6cbdfe1ccb2267a",
+        "observedCommandSha256": "ad837d51018b2079891a4790cfd36b7f9e3934d7fa2794ac330445f72daccc00",
+        "matchedVariant": 3,
+        "carrier": "powershell",
+        "cwdMatches": true,
+        "status": "completed",
+        "exitCode": 0,
+        "outputBytes": 0,
+        "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputFreshReadBlocked": false,
+        "outputStaleExternal": false
+      },
+      {
+        "index": 3,
+        "label": "stale-write",
+        "expectedCommandSha256": "42f635aa22d80050afcbb1c9daf3e9a6de8a6a9d2c33f382e0157d70d870868b",
+        "observedCommandSha256": "f1c39cf396ce5a3cb198127736cdb39a2877813d1225d835be768e94edaa336e",
+        "matchedVariant": 1,
+        "carrier": "powershell",
+        "cwdMatches": true,
+        "status": "completed",
+        "exitCode": 0,
+        "outputBytes": 0,
+        "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputFreshReadBlocked": false,
+        "outputStaleExternal": false
+      }
+    ],
+    "proof": {
+      "schemaVersion": 1,
+      "nonceValid": true,
+      "targetMatches": true,
+      "markerMatches": true,
+      "hashMatches": true,
+      "writtenAtValid": true,
+      "marker": "USER_KEEP_B",
+      "sha256": "af564e24978d22035980d6bb19a754bde8fead15d0341056c7ff68e12da47552",
+      "errorCode": null,
+      "valid": true
+    },
+    "finalContent": {
+      "category": "AGENT_WRITE_C",
+      "bytes": 18,
+      "sha256": "54739c1949503b8f6e69b1d96a3c70057cf686dc37741dda494dcd78f1d2c32b"
+    },
+    "readSucceeded": true,
+    "externalEditProved": true,
+    "thirdCommandSucceeded": true,
+    "thirdCommandBlocked": false,
+    "userMarkerPreserved": false,
+    "agentWriteLanded": true,
+    "dataDirExpected": true,
+    "dataDirSnapshot": {
+      "exists": false,
+      "files": []
+    }
+  },
+  "freshread": {
+    "arm": "freshread",
+    "enabled": true,
+    "passed": true,
+    "processStatus": 0,
+    "processSignal": null,
+    "processEvidence": {
+      "stderr": {
+        "bytes": 462,
+        "sha256": "114e6a0f90599890ba1b9194291c63b3a55d585b3c9bfeb8ca72aa6e1330446a",
+        "truncatedInMemory": false
+      },
+      "protocolBytes": 76500
+    },
+    "protocol": {
+      "threadIdSha256": "75d8e6c785d9cfc000f9f9c36d0ee8a9ddee3af04da690bad3b90ddaafee8dcf",
+      "turnIdSha256": "2ec846693132d86f57d8a22bb1b3fb6b9f3b863d616fb6545ce2a5195781ab29",
+      "initialize": {
+        "platformOs": "windows",
+        "platformFamily": "windows",
+        "codexHome": "<CODEX_HOME>",
+        "codexHomeMatches": true,
+        "userAgentSha256": "16b41463f2112c5579d2f80e30984796166f8fdc585796600b30ce4ca369605f"
+      },
+      "mcpPreflight": {
+        "passed": true,
+        "configReadBeforeThread": true,
+        "discoveredServerCount": 2,
+        "inventoryBindingSha256": "5580a545997e06cc9b629443a4e7cb0b4750a9906e65eb4e85545ad73eb4472d",
+        "initialize": {
+          "platformOs": "windows",
+          "platformFamily": "windows",
+          "codexHome": "<CODEX_HOME>",
+          "codexHomeMatches": true,
+          "userAgentSha256": "16b41463f2112c5579d2f80e30984796166f8fdc585796600b30ce4ca369605f"
+        },
+        "provider": {
+          "passed": true,
+          "model": "gpt-5.6-sol",
+          "modelProvider": "openai",
+          "selectedProviderCustomEntryAbsent": true,
+          "openaiBaseUrlAbsent": true,
+          "chatgptBaseUrlOfficialDefault": true,
+          "chatgptBaseUrlMode": "official-default",
+          "appsFeatureDisabled": true
+        },
+        "processStatus": 0,
+        "processSignal": null,
+        "process": {
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "truncatedInMemory": false
+          },
+          "protocolBytes": 43287
+        }
+      },
+      "mcpIsolation": {
+        "passed": true,
+        "discoveryBound": true,
+        "discoveredServerCount": 2,
+        "effectiveServerCount": 2,
+        "disabledServerCount": 2,
+        "provider": {
+          "passed": true,
+          "model": "gpt-5.6-sol",
+          "modelProvider": "openai",
+          "selectedProviderCustomEntryAbsent": true,
+          "openaiBaseUrlAbsent": true,
+          "chatgptBaseUrlOfficialDefault": true,
+          "chatgptBaseUrlMode": "official-default",
+          "appsFeatureDisabled": true
+        }
+      },
+      "threadRuntime": {
+        "cwd": "<WORKSPACE>",
+        "cwdMatches": true,
+        "ephemeral": true,
+        "approvalPolicy": "never",
+        "sandbox": {
+          "type": "workspaceWrite",
+          "workspaceWritable": true,
+          "writableRootMode": "implicit-primary-cwd",
+          "networkAccess": false
+        },
+        "runtimeRootCoversWorkspace": true,
+        "model": "gpt-5.6-sol",
+        "modelProvider": "openai",
+        "serviceTier": "default",
+        "reasoningEffort": "ultra",
+        "activePermissionProfileSha256": null
+      }
+    },
+    "hookDiscovery": {
+      "passed": true,
+      "workspace": "<WORKSPACE>",
+      "workspaceMatches": true,
+      "warningsCount": 0,
+      "errorsCount": 0,
+      "exactMetadata": true,
+      "hooks": [
+        {
+          "eventName": "postCompact",
+          "enabled": true,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "6151dd078304925950cb45ca5bb2110cf20f9d937a0100e3bf6ab9705532151b",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "67837496de9d56f4c74e28a5a8a318f4a85b3f0d0d4631174ab1f23054bf4314"
+        },
+        {
+          "eventName": "postToolUse",
+          "enabled": true,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "56fe624e058fc045ec9cac730ce7395fda1f6bab9aef2ee8fcfd7feebae65d87",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "5edbd6763565ccd5dd3a7c69e0982e48df3ebc21d0a51ee6a26f6401e0155a17"
+        },
+        {
+          "eventName": "preCompact",
+          "enabled": true,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "6151dd078304925950cb45ca5bb2110cf20f9d937a0100e3bf6ab9705532151b",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "6572211fab0afcd474ac09307a5aefdb6d7dd985da4431afbce1144dfcad6ea4"
+        },
+        {
+          "eventName": "preToolUse",
+          "enabled": true,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "dbe1cda07cdfb0410e9f6b476990e677aee641f02930657b4657aed117637477",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "1cddc5002450d9f3e2f0e8b3456df380e8fbc256727825e7241ec89c21154afd"
+        },
+        {
+          "eventName": "sessionStart",
+          "enabled": true,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": "d5d5d43a493c0fa2e091a00a068dc5088586f307c0a249b36f3eacfc8088344c",
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "8627550b6939a02a1dabc832f0325a285dd93ba1994b182c84673b12a4e45874"
+        },
+        {
+          "eventName": "userPromptSubmit",
+          "enabled": true,
+          "source": "plugin",
+          "pluginId": "freshread@personal",
+          "sourcePath": "<PLUGIN_CACHE>/hooks/hooks.json",
+          "trustStatus": "trusted",
+          "matcherSha256": null,
+          "commandSha256": "9295c147caf848d12429370123102da52b9932ae89def1e7c8b604c97fbce673",
+          "timeoutSec": 30,
+          "handlerType": "command",
+          "currentHashSha256": "60fc0d77ef249d0912821e2b99e70dd48eac167c746a67ee9a6d1e616948cef6"
+        }
+      ]
+    },
+    "hookExecution": {
+      "associationMethod": "exact HookRunSummary run-id prefix/suffix to command item id, cross-event timing, and test-only hashed PreToolUse audit",
+      "lifecycleComplete": true,
+      "exactSequence": true,
+      "hookCountsExact": true,
+      "associationExact": true,
+      "timingExact": true,
+      "auditExact": true,
+      "foreignHookLifecycleEvents": 0,
+      "exactDenial": true,
+      "preToolUse": 3,
+      "postToolUse": 2,
+      "blockedAttempt": {
+        "toolUseIdSha256": "a8b9c0130505eda5a8915bc39f7e162cd8d6aa64867c3f025a3ae9e690c2f529",
+        "commandSha256": "c17f7c40c5ac98aa18e3f1d9c5b5013017a084beb2714f03a02a11980a9d9dcf",
+        "matchedVariant": 0,
+        "decisionCode": "DENY_STALE_EXTERNAL",
+        "noCommandLifecycle": true,
+        "noPostToolUse": true
+      },
+      "runs": [
+        {
+          "ordinal": 1,
+          "eventName": "preToolUse",
+          "status": "completed",
+          "toolUseIdSha256": "9a4b645dcfcab1ffd13e320824734889017663d5e2810aa42a9b5ea23000d710",
+          "auditDecisionCode": "PASS",
+          "auditCommandSha256": "b8f2a923eb2b2c7f88c365435d1e02bc9213ffcea0c11cc4b8c13349d29dc779",
+          "auditMatchedVariant": 0,
+          "entriesBytes": 0,
+          "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "freshReadBlocked": false,
+          "staleExternal": false
+        },
+        {
+          "ordinal": 2,
+          "eventName": "postToolUse",
+          "status": "completed",
+          "toolUseIdSha256": "9a4b645dcfcab1ffd13e320824734889017663d5e2810aa42a9b5ea23000d710",
+          "auditDecisionCode": "PASS",
+          "auditCommandSha256": "b8f2a923eb2b2c7f88c365435d1e02bc9213ffcea0c11cc4b8c13349d29dc779",
+          "auditMatchedVariant": 0,
+          "entriesBytes": 0,
+          "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "freshReadBlocked": false,
+          "staleExternal": false
+        },
+        {
+          "ordinal": 3,
+          "eventName": "preToolUse",
+          "status": "completed",
+          "toolUseIdSha256": "310f735cb20d4b9c2c8e78bb3a4b41645bac35e7ff593452f695423c186654f0",
+          "auditDecisionCode": "PASS",
+          "auditCommandSha256": "f7719a0f10f5bef822d637199f4bebf6397ff8e1e9af1115ece859be81dfc465",
+          "auditMatchedVariant": 0,
+          "entriesBytes": 0,
+          "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "freshReadBlocked": false,
+          "staleExternal": false
+        },
+        {
+          "ordinal": 4,
+          "eventName": "postToolUse",
+          "status": "completed",
+          "toolUseIdSha256": "310f735cb20d4b9c2c8e78bb3a4b41645bac35e7ff593452f695423c186654f0",
+          "auditDecisionCode": "PASS",
+          "auditCommandSha256": "f7719a0f10f5bef822d637199f4bebf6397ff8e1e9af1115ece859be81dfc465",
+          "auditMatchedVariant": 0,
+          "entriesBytes": 0,
+          "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "freshReadBlocked": false,
+          "staleExternal": false
+        },
+        {
+          "ordinal": 5,
+          "eventName": "preToolUse",
+          "status": "blocked",
+          "toolUseIdSha256": "a8b9c0130505eda5a8915bc39f7e162cd8d6aa64867c3f025a3ae9e690c2f529",
+          "auditDecisionCode": "DENY_STALE_EXTERNAL",
+          "auditCommandSha256": "c17f7c40c5ac98aa18e3f1d9c5b5013017a084beb2714f03a02a11980a9d9dcf",
+          "auditMatchedVariant": 0,
+          "entriesBytes": 149,
+          "entriesSha256": "acea4292a0e241e79f5f02c693855e5b92ccf3228158d60bdd0fead3e1b9bc7d",
+          "freshReadBlocked": true,
+          "staleExternal": true
+        }
+      ],
+      "passed": true
+    },
+    "finalResponse": {
+      "passed": true,
+      "completedAgentMessageCount": 1,
+      "finalAnswerCount": 1,
+      "targetErrorNotificationCount": 4,
+      "targetRetriableTransportErrorNotificationCount": 4,
+      "targetTerminalErrorNotificationCount": 0,
+      "exactDone": true,
+      "terminalTextBytes": 4,
+      "terminalTextSha256": "283e91eb85d58ffc2ad922884b644c41b54140660f6d1fda3c403d543eedd839",
+      "terminalPhaseMode": "explicit-final",
+      "explicitFinalCompatible": true,
+      "beforeTurnCompleted": true
+    },
+    "mcpRuntime": {
+      "passed": true,
+      "startupStatusNotificationCount": 0,
+      "noRuntimeMcpStartupObserved": true
+    },
+    "benchmarkAudit": {
+      "passed": true,
+      "recordCount": 3,
+      "errorCode": null,
+      "nonceSha256": "7f0b7b7f162d876caddc882cbea00f9f529c17526b5743978c92738702cdb1ad",
+      "rawToolIdsPersisted": false,
+      "rawCommandsPersisted": false,
+      "records": [
+        {
+          "toolUseIdSha256": "310f735cb20d4b9c2c8e78bb3a4b41645bac35e7ff593452f695423c186654f0",
+          "commandSha256": "f7719a0f10f5bef822d637199f4bebf6397ff8e1e9af1115ece859be81dfc465",
+          "decisionCode": "PASS"
+        },
+        {
+          "toolUseIdSha256": "9a4b645dcfcab1ffd13e320824734889017663d5e2810aa42a9b5ea23000d710",
+          "commandSha256": "b8f2a923eb2b2c7f88c365435d1e02bc9213ffcea0c11cc4b8c13349d29dc779",
+          "decisionCode": "PASS"
+        },
+        {
+          "toolUseIdSha256": "a8b9c0130505eda5a8915bc39f7e162cd8d6aa64867c3f025a3ae9e690c2f529",
+          "commandSha256": "c17f7c40c5ac98aa18e3f1d9c5b5013017a084beb2714f03a02a11980a9d9dcf",
+          "decisionCode": "DENY_STALE_EXTERNAL"
+        }
+      ],
+      "expectedMode": "three-hashed-records",
+      "expectationPassed": true
+    },
+    "toolLedger": {
+      "targetActionCount": 2,
+      "commandExecutionCount": 2,
+      "expectedCommandExecutionCount": 2,
+      "extraActionTypes": [],
+      "foreignActionCount": 0,
+      "exact": true
+    },
+    "exactSequence": true,
+    "commandTrace": [
+      {
+        "index": 1,
+        "label": "read",
+        "expectedCommandSha256": "b8f2a923eb2b2c7f88c365435d1e02bc9213ffcea0c11cc4b8c13349d29dc779",
+        "observedCommandSha256": "a83d45a26df5fe0eac1edd96f5ab3a59f1266b26df144f4583f4efe08fb73771",
+        "matchedVariant": 1,
+        "carrier": "powershell",
+        "cwdMatches": true,
+        "status": "completed",
+        "exitCode": 0,
+        "outputBytes": 13,
+        "outputSha256": "2cef44526a2c4737c7a780569b70db6ef664b5e84ef10446e86c49672884eeae",
+        "outputFreshReadBlocked": false,
+        "outputStaleExternal": false
+      },
+      {
+        "index": 2,
+        "label": "external-edit",
+        "expectedCommandSha256": "f7719a0f10f5bef822d637199f4bebf6397ff8e1e9af1115ece859be81dfc465",
+        "observedCommandSha256": "b5a088939fc043c2ce9dbcfc104622f6330de91f6ab2ee421552c420cbecb189",
+        "matchedVariant": 3,
+        "carrier": "powershell",
+        "cwdMatches": true,
+        "status": "completed",
+        "exitCode": 0,
+        "outputBytes": 0,
+        "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "outputFreshReadBlocked": false,
+        "outputStaleExternal": false
+      }
+    ],
+    "proof": {
+      "schemaVersion": 1,
+      "nonceValid": true,
+      "targetMatches": true,
+      "markerMatches": true,
+      "hashMatches": true,
+      "writtenAtValid": true,
+      "marker": "USER_KEEP_B",
+      "sha256": "af564e24978d22035980d6bb19a754bde8fead15d0341056c7ff68e12da47552",
+      "errorCode": null,
+      "valid": true
+    },
+    "finalContent": {
+      "category": "USER_KEEP_B",
+      "bytes": 12,
+      "sha256": "af564e24978d22035980d6bb19a754bde8fead15d0341056c7ff68e12da47552"
+    },
+    "readSucceeded": true,
+    "externalEditProved": true,
+    "thirdCommandSucceeded": false,
+    "thirdCommandBlocked": true,
+    "userMarkerPreserved": true,
+    "agentWriteLanded": false,
+    "dataDirExpected": true,
+    "dataDirSnapshot": {
+      "exists": true,
+      "files": [
+        {
+          "path": "sessions/c5ee6a3180c4e525aa97a983728292e8.json",
+          "size": 1425,
+          "mtimeMs": 1787552224716.3728,
+          "sha256": "7869b7665eb4de88a721b4877547331c920b37ca012d58dbd307c644e786c843",
+          "jsonStateSummary": {
+            "rootType": "object",
+            "topLevelKeys": [
+              "createdAt",
+              "cwd",
+              "files",
+              "schemaVersion",
+              "sessionId",
+              "updatedAt"
+            ],
+            "nodes": 35,
+            "objects": 7,
+            "arrays": 0,
+            "strings": 23,
+            "numbers": 3,
+            "booleans": 1,
+            "nulls": 1,
+            "maxDepth": 5
+          }
+        }
+      ],
+      "excludedBenchmarkAudit": true
+    }
+  },
+  "launchGate": {
+    "deterministicEligible": true,
+    "liveEligible": true,
+    "runtimeEquivalent": true,
+    "releaseEligible": true
+  },
+  "liveEligible": true,
+  "releaseEligible": true,
+  "passed": true,
+  "eventArtifact": {
+    "name": "live-latest.events.json",
+    "runId": "20260824061217937-e086e618829e98b4",
+    "bytes": 27014,
+    "sha256": "1ae3bfeede75417a47f9cfd10514f7e474640abf90cb12997bb2fb698fc31af7"
+  }
+}

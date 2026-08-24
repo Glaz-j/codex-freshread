@@ -1,0 +1,18 @@
+{
+  "name": "freshread-codex-plugin",
+  "version": "0.1.0",
+  "private": true,
+  "description": "File-context freshness guardrails for Codex.",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "scripts": {
+    "test": "node --test --test-concurrency=1 tests/*.test.cjs",
+    "benchmark": "node benchmarks/run-benchmark.cjs",
+    "benchmark:baseline": "node benchmarks/run-benchmark.cjs --baseline-only",
+    "benchmark:live": "node benchmarks/run-live-benchmark.cjs",
+    "check": "node --check src/freshread-core.cjs && node --check src/command-analyzer.cjs && node --check src/tool-evidence.cjs && node --check src/hook-handler.cjs && node --check scripts/freshread-hook.cjs && node --check scripts/freshread-read.cjs && node --check scripts/freshread-cli.cjs && node --check scripts/freshread-node-path.js && node --check scripts/freshread-launch.js && node --check benchmarks/run-benchmark.cjs && node --check benchmarks/run-live-benchmark.cjs"
+  },
+  "license": "MIT"
+}

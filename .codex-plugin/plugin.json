@@ -1,0 +1,31 @@
+{
+  "name": "freshread",
+  "version": "0.1.0+codex.20260824060943",
+  "description": "Detect when file content remembered by Codex is no longer current, warn at lifecycle boundaries, and guard supported edits until the file is re-read.",
+  "author": {
+    "name": "FreshRead contributors"
+  },
+  "license": "MIT",
+  "keywords": [
+    "freshness",
+    "stale-context",
+    "guardrails",
+    "coding-agent"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "FreshRead",
+    "shortDescription": "Guard Codex against stale file context.",
+    "longDescription": "FreshRead records content identities for files reliably read by Codex, detects self and external changes, restores freshness metadata across resume and compaction, and blocks supported edits when remembered context is stale.",
+    "developerName": "FreshRead contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Read"
+    ],
+    "defaultPrompt": [
+      "Show my FreshRead file-context status."
+    ],
+    "brandColor": "#0F766E"
+  }
+}

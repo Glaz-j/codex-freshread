@@ -1,0 +1,92 @@
+{
+  "description": "FreshRead tracks reliable file reads and checks them before later turns and edits.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "^(startup|resume|clear|compact)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$PLUGIN_ROOT/scripts/freshread-launch.sh\"",
+            "commandWindows": "& $env:SystemRoot\\System32\\cscript.exe //B //Nologo $env:PLUGIN_ROOT\\scripts\\freshread-launch.js",
+            "timeout": 30,
+            "statusMessage": "Checking file-context freshness",
+            "additionalContextLimit": 2000
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$PLUGIN_ROOT/scripts/freshread-launch.sh\"",
+            "commandWindows": "& $env:SystemRoot\\System32\\cscript.exe //B //Nologo $env:PLUGIN_ROOT\\scripts\\freshread-launch.js",
+            "timeout": 30,
+            "statusMessage": "Checking file-context freshness",
+            "additionalContextLimit": 2000
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|shell_command|exec_command|unified_exec|apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$PLUGIN_ROOT/scripts/freshread-launch.sh\"",
+            "commandWindows": "& $env:SystemRoot\\System32\\cscript.exe //B //Nologo $env:PLUGIN_ROOT\\scripts\\freshread-launch.js",
+            "timeout": 30,
+            "statusMessage": "Verifying edit freshness",
+            "additionalContextLimit": 1000
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Bash|shell_command|exec_command|unified_exec|apply_patch|Edit|Write|view_image|mcp__.*(?:read_file|get_file|view_file|read_text).*)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$PLUGIN_ROOT/scripts/freshread-launch.sh\"",
+            "commandWindows": "& $env:SystemRoot\\System32\\cscript.exe //B //Nologo $env:PLUGIN_ROOT\\scripts\\freshread-launch.js",
+            "timeout": 30,
+            "statusMessage": "Updating file-context snapshots",
+            "additionalContextLimit": 1000
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "^(manual|auto)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$PLUGIN_ROOT/scripts/freshread-launch.sh\"",
+            "commandWindows": "& $env:SystemRoot\\System32\\cscript.exe //B //Nologo $env:PLUGIN_ROOT\\scripts\\freshread-launch.js",
+            "timeout": 30,
+            "statusMessage": "Persisting freshness metadata"
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "^(manual|auto)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh \"$PLUGIN_ROOT/scripts/freshread-launch.sh\"",
+            "commandWindows": "& $env:SystemRoot\\System32\\cscript.exe //B //Nologo $env:PLUGIN_ROOT\\scripts\\freshread-launch.js",
+            "timeout": 30,
+            "statusMessage": "Restoring freshness metadata"
+          }
+        ]
+      }
+    ]
+  }
+}

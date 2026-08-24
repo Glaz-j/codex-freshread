@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-24T06:10:24.032Z",
+  "sourceTree": {
+    "algorithm": "SHA-256",
+    "digest": "ca338d7ec6b088cdfe04138729820f79075260a38d8adcc47a25d41e2b69ed8c",
+    "fileCount": 32,
+    "excludes": [
+      "node_modules/**",
+      ".git/**",
+      "benchmarks/results/**"
+    ]
+  },
+  "evidence": {
+    "deterministicState": "PASS",
+    "syntheticHandler": "PASS",
+    "security": "PASS",
+    "coldHookProcess": "PASS",
+    "populatedHookProcess": "PASS",
+    "readRegistrationGrowth": "PASS",
+    "liveCodexLifecycle": "NOT_RUN_NOT_CLAIMED"
+  },
+  "testedHandlerBoundaries": {
+    "UserPromptSubmit": "synthetic handler",
+    "SessionStartResume": "synthetic handler",
+    "SessionStartCompact": "synthetic handler",
+    "PreToolUseApplyPatch": "synthetic handler",
+    "PreToolUseShellCopyMove": "synthetic handler",
+    "hookProcessStdinStdout": "cold process smoke",
+    "populatedUserPromptSubmit": "configured launcher with persisted 1000-file Read Set"
+  },
+  "liveCoverage": {
+    "status": "NOT_RUN",
+    "requiredForThisDeterministicGate": false,
+    "claim": "No live Codex lifecycle coverage is inferred from synthetic events."
+  },
+  "knownExclusions": [
+    "arbitrary subprocess-internal file access",
+    "dynamic paths and opaque mixed pipelines",
+    "TOCTOU changes after PreToolUse and before the actual write",
+    "live Codex resume and compaction lifecycle behavior",
+    "model compliance beyond the deterministic stale-consumer workflow"
+  ]
+}
