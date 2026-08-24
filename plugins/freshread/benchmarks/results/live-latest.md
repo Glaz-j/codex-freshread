@@ -1,9 +1,9 @@
 # FreshRead live Codex A/B
 
-Run: 20260824120730680-86a2ffdb4f2e25cd
-Generated: 2026-08-24T12:08:17.827Z
+Run: 20260824142811062-05b0dcf7d8c8c108
+Generated: 2026-08-24T14:29:56.109Z
 Codex: codex-cli 0.149.0-alpha.4.1 (73d6d4a082a7cad601a446a45b1b3fa9b77aff9d3996052b74d9003d7947d515)
-Plugin: freshread 0.1.0 (769ff2c603e652282be5c4a09a3fac249ddd50e407d2c55bc96e4b9d74873ca8)
+Plugin: freshread 0.1.0 (0e6d4f96afe7fe1ced8d1afc26cac5f8e857b55acbdd203cafc9f26d71c41f0e)
 
 | Metric | Baseline (disabled) | FreshRead |
 | --- | ---: | ---: |
@@ -18,7 +18,7 @@ Plugin: freshread 0.1.0 (769ff2c603e652282be5c4a09a3fac249ddd50e407d2c55bc96e4b9
 | No MCP runtime startup notification | yes | yes |
 | Exact six-hook app-server discovery | yes | yes |
 | Exact final DONE response with no terminal target-turn error | yes | yes |
-| Retriable stream-disconnect notifications (observed) | 0 | 0 |
+| Retriable stream-disconnect notifications (observed) | 4 | 4 |
 | Strict target-turn tool ledger | yes | yes |
 | Strict FreshRead hook lifecycle/order | yes | yes |
 

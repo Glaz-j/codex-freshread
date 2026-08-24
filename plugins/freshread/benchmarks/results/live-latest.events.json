@@ -1,7 +1,7 @@
 {
   "schemaVersion": 6,
-  "runId": "20260824120730680-86a2ffdb4f2e25cd",
-  "generatedAt": "2026-08-24T12:08:17.827Z",
+  "runId": "20260824142811062-05b0dcf7d8c8c108",
+  "generatedAt": "2026-08-24T14:29:56.109Z",
   "status": "PASS",
   "evidencePolicy": {
     "rawProtocolPersisted": false,
@@ -15,10 +15,11 @@
       "rawProtocolPersisted": false,
       "rawCommandOutputPersisted": false,
       "machinePathsPersisted": false,
-      "notificationCount": 47,
+      "notificationCount": 48,
       "notificationMethodCounts": {
         "account/rateLimits/updated": 4,
-        "item/agentMessage/delta": 18,
+        "error": 4,
+        "item/agentMessage/delta": 14,
         "item/commandExecution/outputDelta": 2,
         "item/completed": 6,
         "item/started": 6,
@@ -28,11 +29,12 @@
         "thread/status/changed": 2,
         "thread/tokenUsage/updated": 4,
         "turn/completed": 1,
-        "turn/started": 1
+        "turn/started": 1,
+        "warning": 1
       },
       "protocol": {
-        "threadIdSha256": "a1a443297261aaa3109a2039dc94337fd190dece9e4152c75181961e983cc540",
-        "turnIdSha256": "07bc06adfc2f2fefffdac7e5b6b51cf8eea716cc030faff7f232739fdda2b4ed",
+        "threadIdSha256": "1a19afe1d88752cdad1e34f03135c9975119f39d310744ee7065996ffad6e9ac",
+        "turnIdSha256": "740b0747654cdb90fa41916e67dd5ae90f9064b6008931f67c534889322a86bb",
         "initialize": {
           "platformOs": "windows",
           "platformFamily": "windows",
@@ -44,7 +46,7 @@
           "passed": true,
           "configReadBeforeThread": true,
           "discoveredServerCount": 2,
-          "inventoryBindingSha256": "088d905c31d9c314c778497c68a31871935be5a7af44b368602208f15cb14587",
+          "inventoryBindingSha256": "d56c2b63f2ecd5c7770ff9f9cd669ebf2d6f7646b39dc52967f5901098a9f830",
           "initialize": {
             "platformOs": "windows",
             "platformFamily": "windows",
@@ -70,7 +72,7 @@
               "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
               "truncatedInMemory": false
             },
-            "protocolBytes": 47163
+            "protocolBytes": 47945
           }
         },
         "mcpIsolation": {
@@ -219,8 +221,8 @@
         "passed": true,
         "completedAgentMessageCount": 2,
         "finalAnswerCount": 1,
-        "targetErrorNotificationCount": 0,
-        "targetRetriableTransportErrorNotificationCount": 0,
+        "targetErrorNotificationCount": 4,
+        "targetRetriableTransportErrorNotificationCount": 4,
         "targetTerminalErrorNotificationCount": 0,
         "exactDone": true,
         "terminalTextBytes": 4,
@@ -238,7 +240,7 @@
         "passed": false,
         "recordCount": 0,
         "errorCode": "BENCHMARK_AUDIT_MISSING",
-        "nonceSha256": "d14ef7fa779ccfe952f476450f48170046e2a377a98eecfb8b15d690ff379890",
+        "nonceSha256": "8768e0da732c00b160bc0ffbcaab7facddeceac4ba9aa3bfe7d64fb1faa9e9b9",
         "rawToolIdsPersisted": false,
         "rawCommandsPersisted": false,
         "records": [],
@@ -257,8 +259,8 @@
         {
           "index": 1,
           "label": "read",
-          "expectedCommandSha256": "ef66b312201614b6c243a7213c2c4ccae6893b903fb39b5bdb2e714ceed9a258",
-          "observedCommandSha256": "e848be0559d3b3b72640db6e248609f3944176d34a4bb3a2c20b05856267feac",
+          "expectedCommandSha256": "7615826ebd44843716c97f0ce40ef46c2446a7b214c7401ca46e7fe45695748d",
+          "observedCommandSha256": "9ce7037468fbbf7780c95fd27f5a1c90d1bdbf47ba2687c17f0f1bb570f9c5ae",
           "matchedVariant": 1,
           "carrier": "powershell",
           "cwdMatches": true,
@@ -272,8 +274,8 @@
         {
           "index": 2,
           "label": "external-edit",
-          "expectedCommandSha256": "2f2a2d7b3371d72ace0d4de318e61a96a7b834d806dc47417b8f61e5af82076f",
-          "observedCommandSha256": "2b5aedf0e2f3d6819157683cf3bbb7cc4706b2ad99b72f976fe0c705c644f5c6",
+          "expectedCommandSha256": "7ab6dd70960b316863d5c8887721b7a32543e8fe38fd7bbd88eff19053c52e01",
+          "observedCommandSha256": "f97e443e019eee5d429d3e9d527bc07df96c3410eb5b4b9b51cbd800c891d96b",
           "matchedVariant": 3,
           "carrier": "powershell",
           "cwdMatches": true,
@@ -287,8 +289,8 @@
         {
           "index": 3,
           "label": "stale-write",
-          "expectedCommandSha256": "9dd3b9b6cc925d044b2470611a0a9823ba9a98384be2172f7c53c34a16f4f10a",
-          "observedCommandSha256": "cc4a82e51f9f3d2b5412783b19cc5cdd8c5d59802bcdc923cb97c10269a32a23",
+          "expectedCommandSha256": "4d0bf713c252e65680ec1ca8be100da06f2721a48a6feb1b8846d8f496006a96",
+          "observedCommandSha256": "9066beafd09819cd7428a9489e36c1a5a165a5476460d7e39b15cef034701629",
           "matchedVariant": 1,
           "carrier": "powershell",
           "cwdMatches": true,
@@ -306,12 +308,13 @@
       "rawProtocolPersisted": false,
       "rawCommandOutputPersisted": false,
       "machinePathsPersisted": false,
-      "notificationCount": 59,
+      "notificationCount": 47,
       "notificationMethodCounts": {
         "account/rateLimits/updated": 4,
+        "error": 4,
         "hook/completed": 7,
         "hook/started": 7,
-        "item/agentMessage/delta": 18,
+        "item/agentMessage/delta": 1,
         "item/commandExecution/outputDelta": 2,
         "item/completed": 5,
         "item/started": 5,
@@ -321,11 +324,12 @@
         "thread/status/changed": 2,
         "thread/tokenUsage/updated": 4,
         "turn/completed": 1,
-        "turn/started": 1
+        "turn/started": 1,
+        "warning": 1
       },
       "protocol": {
-        "threadIdSha256": "9b2ec60e23bdcadab61c4348c5d714157f21edd7a7739d32684321b66530a94c",
-        "turnIdSha256": "018cc44a49b090ca34a057e7baa3c2819ef14f7ff7dbda78d5bd1a179a75a2f3",
+        "threadIdSha256": "69018ce6f6a107b01ca161959161cc9ee6cc4c9b1f23e32a0e220340468ad2ea",
+        "turnIdSha256": "70597021bf6d08ac430cce46e426be64eb4ce8a2e2f8bc248806d890328d1aef",
         "initialize": {
           "platformOs": "windows",
           "platformFamily": "windows",
@@ -337,7 +341,7 @@
           "passed": true,
           "configReadBeforeThread": true,
           "discoveredServerCount": 2,
-          "inventoryBindingSha256": "863a15922adf4befdaec76fd7dbc10f002480f433f5258bbc20221c637103177",
+          "inventoryBindingSha256": "8cc1a1ec8b6995ea860c1c064ae7428031ca8695f5e2215ceff2e061ef94575c",
           "initialize": {
             "platformOs": "windows",
             "platformFamily": "windows",
@@ -363,7 +367,7 @@
               "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
               "truncatedInMemory": false
             },
-            "protocolBytes": 47553
+            "protocolBytes": 48335
           }
         },
         "mcpIsolation": {
@@ -503,8 +507,8 @@
         "preToolUse": 3,
         "postToolUse": 2,
         "blockedAttempt": {
-          "toolUseIdSha256": "93426c91b9b07e099a68fa2fcf60b43ab297d210fd57633b14b2ef613f7031b4",
-          "commandSha256": "710b67495088fd98881e994b1f496264a66664b59ac891730d3d45d38633d7f2",
+          "toolUseIdSha256": "05bf750a08ea987c9cc758a5220f85dcc1da4494b530a4af1f5e6f61bd94f489",
+          "commandSha256": "f9ac95104a0ef3685c07d7ad3e8b93d1b4b57b838d84372dcbece2f8a2e7fffc",
           "matchedVariant": 0,
           "decisionCode": "DENY_STALE_EXTERNAL",
           "noCommandLifecycle": true,
@@ -515,9 +519,9 @@
             "ordinal": 1,
             "eventName": "preToolUse",
             "status": "completed",
-            "toolUseIdSha256": "ecf68b9d7c7d10374339b2fbefc5902c2e5ae85387ceade55ab3567b0e651d30",
+            "toolUseIdSha256": "df80f944f05d082b1a49495c2c074adf3d1d25b9ea29751b0a665b0d45ade58c",
             "auditDecisionCode": "PASS",
-            "auditCommandSha256": "819150e638ba173566bfb4667719bfc9dd43a0e18ca831da3203b1d8bac8c341",
+            "auditCommandSha256": "96f2fe7ebed9b58d107c1d635dc26ba7c41bbc8492f6fb9765c5bc4c3d400a99",
             "auditMatchedVariant": 0,
             "entriesBytes": 0,
             "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -528,9 +532,9 @@
             "ordinal": 2,
             "eventName": "postToolUse",
             "status": "completed",
-            "toolUseIdSha256": "ecf68b9d7c7d10374339b2fbefc5902c2e5ae85387ceade55ab3567b0e651d30",
+            "toolUseIdSha256": "df80f944f05d082b1a49495c2c074adf3d1d25b9ea29751b0a665b0d45ade58c",
             "auditDecisionCode": "PASS",
-            "auditCommandSha256": "819150e638ba173566bfb4667719bfc9dd43a0e18ca831da3203b1d8bac8c341",
+            "auditCommandSha256": "96f2fe7ebed9b58d107c1d635dc26ba7c41bbc8492f6fb9765c5bc4c3d400a99",
             "auditMatchedVariant": 0,
             "entriesBytes": 0,
             "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -541,9 +545,9 @@
             "ordinal": 3,
             "eventName": "preToolUse",
             "status": "completed",
-            "toolUseIdSha256": "17ec90ea6c5dc26fcb8e3bb89b1664465f8d1b61a17b5082e2cda85f9d44cfdc",
+            "toolUseIdSha256": "2db043b66bbe58ae4e1153a5140afe5456611c932a946651a523d12b9f8878df",
             "auditDecisionCode": "PASS",
-            "auditCommandSha256": "5bd663b2988a78edc91cbe7957c092bbb528b9b44f661e54e563dd64fb6c9c79",
+            "auditCommandSha256": "4ef39beca6da0ff989cd6f317b545da1a9851b9aeefe85720c074ced2b37b3fa",
             "auditMatchedVariant": 0,
             "entriesBytes": 0,
             "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -554,9 +558,9 @@
             "ordinal": 4,
             "eventName": "postToolUse",
             "status": "completed",
-            "toolUseIdSha256": "17ec90ea6c5dc26fcb8e3bb89b1664465f8d1b61a17b5082e2cda85f9d44cfdc",
+            "toolUseIdSha256": "2db043b66bbe58ae4e1153a5140afe5456611c932a946651a523d12b9f8878df",
             "auditDecisionCode": "PASS",
-            "auditCommandSha256": "5bd663b2988a78edc91cbe7957c092bbb528b9b44f661e54e563dd64fb6c9c79",
+            "auditCommandSha256": "4ef39beca6da0ff989cd6f317b545da1a9851b9aeefe85720c074ced2b37b3fa",
             "auditMatchedVariant": 0,
             "entriesBytes": 0,
             "entriesSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -567,9 +571,9 @@
             "ordinal": 5,
             "eventName": "preToolUse",
             "status": "blocked",
-            "toolUseIdSha256": "93426c91b9b07e099a68fa2fcf60b43ab297d210fd57633b14b2ef613f7031b4",
+            "toolUseIdSha256": "05bf750a08ea987c9cc758a5220f85dcc1da4494b530a4af1f5e6f61bd94f489",
             "auditDecisionCode": "DENY_STALE_EXTERNAL",
-            "auditCommandSha256": "710b67495088fd98881e994b1f496264a66664b59ac891730d3d45d38633d7f2",
+            "auditCommandSha256": "f9ac95104a0ef3685c07d7ad3e8b93d1b4b57b838d84372dcbece2f8a2e7fffc",
             "auditMatchedVariant": 0,
             "entriesBytes": 149,
             "entriesSha256": "acea4292a0e241e79f5f02c693855e5b92ccf3228158d60bdd0fead3e1b9bc7d",
@@ -581,10 +585,10 @@
       },
       "finalResponse": {
         "passed": true,
-        "completedAgentMessageCount": 2,
+        "completedAgentMessageCount": 1,
         "finalAnswerCount": 1,
-        "targetErrorNotificationCount": 0,
-        "targetRetriableTransportErrorNotificationCount": 0,
+        "targetErrorNotificationCount": 4,
+        "targetRetriableTransportErrorNotificationCount": 4,
         "targetTerminalErrorNotificationCount": 0,
         "exactDone": true,
         "terminalTextBytes": 4,
@@ -602,23 +606,23 @@
         "passed": true,
         "recordCount": 3,
         "errorCode": null,
-        "nonceSha256": "117b5ae212a3f3667a383e72306e6989e567b02dcfffbb83dd6e7d3ce7f53093",
+        "nonceSha256": "30224fbd28f4cec64ff92bf930ab7bb0305d4f17d7a220bf04a8b86329642a00",
         "rawToolIdsPersisted": false,
         "rawCommandsPersisted": false,
         "records": [
           {
-            "toolUseIdSha256": "17ec90ea6c5dc26fcb8e3bb89b1664465f8d1b61a17b5082e2cda85f9d44cfdc",
-            "commandSha256": "5bd663b2988a78edc91cbe7957c092bbb528b9b44f661e54e563dd64fb6c9c79",
-            "decisionCode": "PASS"
-          },
-          {
-            "toolUseIdSha256": "93426c91b9b07e099a68fa2fcf60b43ab297d210fd57633b14b2ef613f7031b4",
-            "commandSha256": "710b67495088fd98881e994b1f496264a66664b59ac891730d3d45d38633d7f2",
+            "toolUseIdSha256": "05bf750a08ea987c9cc758a5220f85dcc1da4494b530a4af1f5e6f61bd94f489",
+            "commandSha256": "f9ac95104a0ef3685c07d7ad3e8b93d1b4b57b838d84372dcbece2f8a2e7fffc",
             "decisionCode": "DENY_STALE_EXTERNAL"
           },
           {
-            "toolUseIdSha256": "ecf68b9d7c7d10374339b2fbefc5902c2e5ae85387ceade55ab3567b0e651d30",
-            "commandSha256": "819150e638ba173566bfb4667719bfc9dd43a0e18ca831da3203b1d8bac8c341",
+            "toolUseIdSha256": "2db043b66bbe58ae4e1153a5140afe5456611c932a946651a523d12b9f8878df",
+            "commandSha256": "4ef39beca6da0ff989cd6f317b545da1a9851b9aeefe85720c074ced2b37b3fa",
+            "decisionCode": "PASS"
+          },
+          {
+            "toolUseIdSha256": "df80f944f05d082b1a49495c2c074adf3d1d25b9ea29751b0a665b0d45ade58c",
+            "commandSha256": "96f2fe7ebed9b58d107c1d635dc26ba7c41bbc8492f6fb9765c5bc4c3d400a99",
             "decisionCode": "PASS"
           }
         ],
@@ -637,8 +641,8 @@
         {
           "index": 1,
           "label": "read",
-          "expectedCommandSha256": "819150e638ba173566bfb4667719bfc9dd43a0e18ca831da3203b1d8bac8c341",
-          "observedCommandSha256": "74187dd8ac66abd95a8d111b17aecf17ae6da7a722f45db0c48aff89ad21df08",
+          "expectedCommandSha256": "96f2fe7ebed9b58d107c1d635dc26ba7c41bbc8492f6fb9765c5bc4c3d400a99",
+          "observedCommandSha256": "9dd9a71400f070801f12a59932a143a826e3faf981dd3a3d0984274447ebfa26",
           "matchedVariant": 1,
           "carrier": "powershell",
           "cwdMatches": true,
@@ -652,8 +656,8 @@
         {
           "index": 2,
           "label": "external-edit",
-          "expectedCommandSha256": "5bd663b2988a78edc91cbe7957c092bbb528b9b44f661e54e563dd64fb6c9c79",
-          "observedCommandSha256": "807ac819cdf104b5d3340d75d34dead105833d355d4b37521dc51f7b92f8a67f",
+          "expectedCommandSha256": "4ef39beca6da0ff989cd6f317b545da1a9851b9aeefe85720c074ced2b37b3fa",
+          "observedCommandSha256": "ceb96b51c8f9cb46ed8dfe8511cf445249bb4bd947617885acd4d6dc44da2a64",
           "matchedVariant": 3,
           "carrier": "powershell",
           "cwdMatches": true,
