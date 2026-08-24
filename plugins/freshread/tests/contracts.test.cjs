@@ -91,18 +91,49 @@ function launcherFixture(t) {
   return { attackerBin, pluginData, workspace };
 }
 
-function trustedNodeExecutable() {
-  if (process.platform !== "win32") return process.execPath;
-  const roots = [
-    process.env.ProgramFiles,
-    process.env.ProgramW6432,
-    process.env["ProgramFiles(x86)"],
-  ].filter(Boolean);
-  for (const root of roots) {
-    const candidate = path.join(root, "nodejs", "node.exe");
-    if (fs.existsSync(candidate)) return fs.realpathSync.native(candidate);
+function trustedWindowsNodeFixture(t, workspace) {
+  assert.equal(process.platform, "win32");
+  const fixtureRoot = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-trusted-runtime-"));
+  const programFiles = path.join(fixtureRoot, "Program Files");
+  const nodeDirectory = path.join(programFiles, "nodejs");
+  const nodeExecutable = path.join(nodeDirectory, "node.exe");
+  try {
+    fs.mkdirSync(nodeDirectory, { recursive: true });
+    // Windows keeps the currently running executable locked through every hard
+    // link to the same file record. A private byte-for-byte copy remains
+    // executable while allowing deterministic cleanup on Node 18 and newer.
+    fs.copyFileSync(process.execPath, nodeExecutable, fs.constants.COPYFILE_EXCL);
+  } catch (error) {
+    fs.rmSync(fixtureRoot, { recursive: true, force: true });
+    throw error;
   }
-  assert.fail("a system Node installation under Program Files is required for the Windows launcher contract");
+
+  const relativeToWorkspace = path.relative(
+    fs.realpathSync.native(workspace),
+    fs.realpathSync.native(nodeExecutable)
+  );
+  assert.ok(
+    relativeToWorkspace === ".." || relativeToWorkspace.startsWith(`..${path.sep}`),
+    "the trusted Node fixture must remain outside the attacker-controlled workspace"
+  );
+
+  t.after(() => fs.rmSync(fixtureRoot, { recursive: true, force: true }));
+  return {
+    nodeDirectory,
+    nodeExecutable,
+    env(baseEnv, pathEntries = []) {
+      const env = { ...baseEnv };
+      const replaced = new Set(["path", "programfiles", "programw6432", "programfiles(x86)"]);
+      for (const key of Object.keys(env)) {
+        if (replaced.has(key.toLowerCase())) delete env[key];
+      }
+      env.ProgramFiles = programFiles;
+      env.ProgramW6432 = programFiles;
+      env["ProgramFiles(x86)"] = programFiles;
+      env.PATH = [...pathEntries, nodeDirectory].join(path.delimiter);
+      return env;
+    },
+  };
 }
 
 test("all hook events use fixed-system launchers with a 30-second timeout", () => {
@@ -140,7 +171,6 @@ test("all hook events use fixed-system launchers with a 30-second timeout", () =
 test("launcher rejects workspace and relative PATH node candidates while preserving plugin environment", (t) => {
   const fx = launcherFixture(t);
   const pluginRoot = path.resolve(__dirname, "..");
-  const trustedNodeDir = path.dirname(trustedNodeExecutable());
   const event = {
     session_id: "launcher-contract",
     cwd: fx.workspace,
@@ -149,11 +179,16 @@ test("launcher rejects workspace and relative PATH node candidates while preserv
     tool_use_id: "launcher-read",
     tool_input: { command: `Get-Content -LiteralPath '${path.join(fx.workspace, "sample.txt")}' -Raw -Encoding utf8` },
   };
-  const env = { ...process.env, PLUGIN_ROOT: fs.realpathSync.native(pluginRoot), PLUGIN_DATA: fx.pluginData };
-  for (const key of Object.keys(env)) {
-    if (key.toLowerCase() === "path") delete env[key];
+  let env = { ...process.env, PLUGIN_ROOT: fs.realpathSync.native(pluginRoot), PLUGIN_DATA: fx.pluginData };
+  if (process.platform === "win32") {
+    const trustedNode = trustedWindowsNodeFixture(t, fx.workspace);
+    env = trustedNode.env(env, [".", fx.attackerBin]);
+  } else {
+    for (const key of Object.keys(env)) {
+      if (key.toLowerCase() === "path") delete env[key];
+    }
+    env.PATH = [".", fx.attackerBin, path.dirname(process.execPath)].join(path.delimiter);
   }
-  env.PATH = [".", fx.attackerBin, trustedNodeDir].join(path.delimiter);
 
   let result;
   const hooksConfig = JSON.parse(fs.readFileSync(path.join(pluginRoot, "hooks", "hooks.json"), "utf8"));
@@ -186,23 +221,24 @@ test("launcher rejects workspace and relative PATH node candidates while preserv
 
 test("Windows fast discovery rejects workspace PATH entries and selects a normal absolute Node", { skip: process.platform !== "win32" }, (t) => {
   const fx = launcherFixture(t);
-  const trustedNode = trustedNodeExecutable();
-  const trustedNodeDir = path.dirname(trustedNode);
+  const trustedNode = trustedWindowsNodeFixture(t, fx.workspace);
   const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT;
   const cscript = path.join(systemRoot, "System32", "cscript.exe");
   const discovery = path.join(pluginRoot, "scripts", "freshread-node-path.js");
-  const env = { ...process.env, PLUGIN_ROOT: fs.realpathSync.native(pluginRoot) };
-  for (const key of Object.keys(env)) {
-    if (key.toLowerCase() === "path") delete env[key];
-  }
-  env.PATH = [".", fx.attackerBin, trustedNodeDir].join(path.delimiter);
+  const env = trustedNode.env(
+    { ...process.env, PLUGIN_ROOT: fs.realpathSync.native(pluginRoot) },
+    [".", fx.attackerBin]
+  );
   const result = spawnSync(cscript, ["//B", "//Nologo", discovery], {
     cwd: fx.workspace,
     env,
     encoding: "utf8",
   });
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(path.resolve(result.stdout.trim()).toLowerCase(), path.resolve(trustedNode).toLowerCase());
+  assert.equal(
+    path.resolve(result.stdout.trim()).toLowerCase(),
+    path.resolve(trustedNode.nodeExecutable).toLowerCase()
+  );
 });
 
 test("Windows fast discovery explicitly rejects reparse-backed workspaces", { skip: process.platform !== "win32" }, (t) => {
@@ -228,6 +264,7 @@ test("Windows hook carrier preserves a literal percent sequence in PLUGIN_ROOT",
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "freshread-percent-root-"));
   const pluginAlias = path.join(root, "plugin-%FRESHREAD_SEGMENT%");
   fs.symlinkSync(pluginRoot, pluginAlias, "junction");
+  const trustedNode = trustedWindowsNodeFixture(t, root);
   t.after(() => {
     try { fs.unlinkSync(pluginAlias); } catch (error) { if (error.code !== "ENOENT") throw error; }
     fs.rmSync(root, { recursive: true, force: true });
@@ -235,16 +272,16 @@ test("Windows hook carrier preserves a literal percent sequence in PLUGIN_ROOT",
   const hooksConfig = JSON.parse(fs.readFileSync(path.join(pluginRoot, "hooks", "hooks.json"), "utf8"));
   const commandWindows = hooksConfig.hooks.UserPromptSubmit[0].hooks[0].commandWindows;
   const systemRoot = process.env.SystemRoot || process.env.SYSTEMROOT;
+  const baseEnv = {
+    ...process.env,
+    FRESHREAD_SEGMENT: "EXPANDED",
+    PLUGIN_ROOT: pluginAlias,
+  };
   const discovery = spawnSync(path.join(systemRoot, "System32", "cscript.exe"), [
     "//B", "//Nologo", path.join(pluginAlias, "scripts", "freshread-node-path.js"),
   ], {
     cwd: root,
-    env: {
-      ...process.env,
-      FRESHREAD_SEGMENT: "EXPANDED",
-      PLUGIN_ROOT: pluginAlias,
-      PATH: path.dirname(process.execPath),
-    },
+    env: trustedNode.env(baseEnv),
     encoding: "utf8",
   });
   assert.equal(discovery.status, 5);
@@ -252,13 +289,7 @@ test("Windows hook carrier preserves a literal percent sequence in PLUGIN_ROOT",
 
   const result = runWindowsHook(commandWindows, {
     cwd: root,
-    env: {
-      ...process.env,
-      FRESHREAD_SEGMENT: "EXPANDED",
-      PLUGIN_ROOT: pluginAlias,
-      PLUGIN_DATA: path.join(root, "plugin-data"),
-      PATH: path.dirname(process.execPath),
-    },
+    env: trustedNode.env({ ...baseEnv, PLUGIN_DATA: path.join(root, "plugin-data") }),
     input: JSON.stringify({
       session_id: "percent-root-contract",
       cwd: root,
