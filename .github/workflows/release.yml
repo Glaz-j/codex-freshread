@@ -165,7 +165,7 @@ jobs:
       - name: Revalidate downloaded release assets
         run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --require-release-evidence --zip "dist/freshread-$RELEASE_TAG.zip"
       - name: Create release or refresh its assets
-        uses: actions/github-script@d746ffe35508b1917358783b479e04febd2b8f71 # v9.0.0
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           github-token: ${{ github.token }}
           script: |
