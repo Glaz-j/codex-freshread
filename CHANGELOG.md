@@ -48,6 +48,9 @@ No user-visible changes yet.
   do not yet carry the same public qualification claim.
 - Unsupported or unobservable writes can remain outside the protected surface;
   consult `plugins/freshread/docs/COVERAGE.md` before relying on enforcement.
+- Lifecycle warnings can miss a change that preserves the complete metadata
+  tuple, including rapid same-size writes on coarse or cached timestamps;
+  supported pre-edit checks still force SHA-256 before allowing an edit.
 
 [Unreleased]: https://github.com/Glaz-j/codex-freshread/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Glaz-j/codex-freshread/releases/tag/v0.1.0
