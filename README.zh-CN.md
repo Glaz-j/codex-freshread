@@ -9,6 +9,10 @@
 
 [English](README.md) · 简体中文
 
+[![Release](https://img.shields.io/github/v/release/Glaz-j/codex-freshread?label=release)](https://github.com/Glaz-j/codex-freshread/releases/latest)
+[![CI](https://github.com/Glaz-j/codex-freshread/actions/workflows/ci.yml/badge.svg)](https://github.com/Glaz-j/codex-freshread/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 </div>
 
 > [!IMPORTANT]
@@ -61,21 +65,32 @@ FreshRead 阻止编辑并要求 Codex 重新读取
 
 ### 安装
 
-FreshRead 当前以本地个人 Marketplace 构建形式发行；本文档不宣称它已经进入公共插件目录。
-在已经把这份源码注册到默认个人 Marketplace 的环境中，可以使用：
+通过 Git-backed FreshRead Marketplace 安装稳定版 `v0.1.0`：
 
-```text
-codex plugin add freshread@personal
+```bash
+codex plugin marketplace add Glaz-j/codex-freshread --ref v0.1.0
+codex plugin add freshread@freshread
 ```
 
 请使用受支持的 Codex 0.145.0+ 可执行文件运行该命令，并通过 `codex --version` 核对版本。
 即使旧版 0.132.0 Windows Hook 运行器能够发现或列出插件，也不要依赖它执行 FreshRead 拦截。
 
-安装或更新后：
+发布页面同时提供便于审计的插件 ZIP 和校验值：
+[FreshRead v0.1.0](https://github.com/Glaz-j/codex-freshread/releases/tag/v0.1.0)。
+上面的 Marketplace 命令仍是受支持的安装主路径。
+
+> [!NOTE]
+> 这个仓库是 Git-backed Codex Marketplace，与 ChatGPT 和 Codex 共用的通用公共
+> Plugins Directory 相互独立。能够从本仓库安装，并不表示 FreshRead 已经进入公共目录。
+
+#### 信任生命周期 Hook
+
+安装或启用插件不会自动信任插件 Hook。每次安装或更新后：
 
 1. 启动一个新的 Codex CLI 会话。
 2. 在 CLI 中输入 `/hooks`。
-3. 检查、信任并启用六个 FreshRead Hook 定义。
+3. 检查并信任六个 FreshRead Hook 定义：`SessionStart`、`UserPromptSubmit`、
+   `PreToolUse`、`PostToolUse`、`PreCompact` 和 `PostCompact`。
 4. 新建 Codex 对话后再测试刚安装的版本。
 
 `/hooks` 是 **Codex CLI 命令**，不是 FreshRead 命令，在 ChatGPT「工作」输入框中不会出现。
@@ -83,6 +98,62 @@ codex plugin add freshread@personal
 Codex 会把信任状态绑定到当前 Hook 定义的哈希。如果更新导致哈希改变，Codex 会跳过
 该 Hook，直到用户重新检查并信任它。宿主信任模型请参阅
 [Codex Hooks 官方文档](https://learn.chatgpt.com/docs/hooks)。
+
+#### 预览 `main`
+
+`main` 是持续移动的开发通道。只有需要测试尚未进入正式 Tag 的变化时才使用：
+
+```bash
+codex plugin marketplace add Glaz-j/codex-freshread --ref main
+codex plugin add freshread@freshread
+```
+
+需要可复现安装的工作流不应使用预览通道。
+
+#### 升级
+
+已经跟随 `main` 的安装可通过下面的命令刷新：
+
+```bash
+codex plugin marketplace upgrade freshread
+codex plugin remove freshread@freshread
+codex plugin add freshread@freshread
+```
+
+FreshRead 项目约定不会主动移动已经发布的 Tag。要把稳定版升级到新 Tag，请把下面的
+`v0.2.0` 替换为你已经审查过的发布版本：
+
+```bash
+codex plugin remove freshread@freshread
+codex plugin marketplace remove freshread
+codex plugin marketplace add Glaz-j/codex-freshread --ref v0.2.0
+codex plugin add freshread@freshread
+```
+
+如果 Hook 定义哈希发生变化，请重新检查并信任当前 Hook，然后新建对话。
+
+#### 回滚
+
+把 Marketplace 重新固定到希望恢复的旧版本。例如：
+
+```bash
+codex plugin remove freshread@freshread
+codex plugin marketplace remove freshread
+codex plugin marketplace add Glaz-j/codex-freshread --ref v0.1.0
+codex plugin add freshread@freshread
+```
+
+随后运行 `/hooks` 检查恢复后的定义，并新建对话。
+
+#### 卸载
+
+```bash
+codex plugin remove freshread@freshread
+codex plugin marketplace remove freshread
+```
+
+第二条命令会移除已经配置的 FreshRead Marketplace。卸载会停止 Hook，但不一定删除
+`PLUGIN_DATA` 中的历史数据；请参阅[隐私与安全](#隐私与安全)。
 
 ### 使用
 
@@ -166,7 +237,7 @@ FreshRead 只接受能够保守绑定到本地文件的证据。
 - 当宿主只暴露父会话标识时，无法可靠实现的子 Agent 隔离。
 
 不支持的读取仍会正常执行，但不会刷新已读集合。完整契约请参阅
-[覆盖范围与已知风险](docs/COVERAGE.md)。
+[覆盖范围与已知风险](plugins/freshread/docs/COVERAGE.md)。
 
 ## 隐私与安全
 
@@ -200,46 +271,60 @@ FreshRead V0 不会自动清理旧的会话状态文件。`freshread clear` 只�
 总体发布资格还要求确定性报告和真实报告绑定到同一份源码摘要。当前签入的匹配报告中，
 确定性、安全、性能和真实 Codex app-server 门禁均已通过。
 
-- [最新确定性 Benchmark](benchmarks/results/latest.md)
-- [最新真实 Codex A/B](benchmarks/results/live-latest.md)
-- [Benchmark 契约](docs/BENCHMARK.md)
+- [最新确定性 Benchmark](plugins/freshread/benchmarks/results/latest.md)
+- [最新真实 Codex A/B](plugins/freshread/benchmarks/results/live-latest.md)
+- [Benchmark 契约](plugins/freshread/docs/BENCHMARK.md)
 
 这些证据只证明经过刻意规范化的受支持工作流，并不代表整个工作区或操作系统级审计覆盖率。
-当前真实发布证据基于 Windows；其他平台启动器尚不具备同等级别的端到端真实 A/B 资格声明。
-恢复与上下文压缩场景仍属于确定性/合成协议证据，除非具体报告明确标注为真实测试。
+Windows 已通过具备发布资格的真实 Codex A/B 门禁。macOS 和 Linux 已纳入 CI 与确定性测试，
+但它们的启动器尚未完成同等级别、具备发布资格的真实 A/B 验证。恢复与上下文压缩场景仍属于
+确定性/合成协议证据，除非具体报告明确标注为真实测试。
 
 ## 开发
 
 FreshRead 直接发行可运行的 CommonJS 文件，没有编译或 `dist/` 步骤。Node.js 负责语法检查
 并直接执行插件。
 
-```text
-npm run check
-npm test
-npm run benchmark
+```bash
+npm --prefix plugins/freshread run check
+npm --prefix plugins/freshread test
+npm --prefix plugins/freshread run benchmark
 ```
 
-只有在安装了完全一致的源码版本、信任了当前 Hook，并启动新 Codex 会话后，才运行真实门禁：
+只有在安装了完全一致的源码版本、信任了当前 Hook，并启动新 Codex 会话后，才运行真实门禁。
+请显式选择仓库 Marketplace（Runner 默认使用本地开发用的 `personal` Marketplace）：
 
-```text
-npm run benchmark:live
+```bash
+FRESHREAD_MARKETPLACE=freshread npm --prefix plugins/freshread run benchmark:live
 ```
+
+PowerShell 等价命令：
+
+```powershell
+$env:FRESHREAD_MARKETPLACE = "freshread"
+npm --prefix plugins/freshread run benchmark:live
+```
+
+也可以先执行 `cd plugins/freshread`，然后运行不带 `--prefix` 的对应 `npm` 脚本。
 
 项目结构：
 
 ```text
-.codex-plugin/plugin.json   插件身份与界面元数据
-skills/freshread/           面向模型的工作流说明
-hooks/hooks.json            生命周期注册配置
-scripts/                    跨平台启动器与 Hook 入口
-src/                        状态机、命令分析与证据逻辑
-tests/                      单元、契约、边界与安全加固测试
-benchmarks/                 确定性与真实 A/B 发布门禁
-docs/                       详细覆盖范围与 Benchmark 契约
+.agents/plugins/marketplace.json      Git-backed Marketplace 目录
+.github/workflows/                    CI 与 Tag 发布自动化
+plugins/freshread/.codex-plugin/      插件身份与界面元数据
+plugins/freshread/skills/freshread/   面向模型的工作流说明
+plugins/freshread/hooks/              生命周期注册配置
+plugins/freshread/scripts/            跨平台启动器与 Hook 入口
+plugins/freshread/src/                状态机、命令分析与证据逻辑
+plugins/freshread/tests/              单元、契约、边界与安全加固测试
+plugins/freshread/benchmarks/         确定性与真实 A/B 发布门禁
+plugins/freshread/docs/               覆盖范围与 Benchmark 契约
 ```
 
-更新已安装的本地版本时，应修改开发源码、完成校验、更新 Manifest cachebuster、从
-Marketplace 重新安装并新建对话。不要直接修改安装缓存。
+Tag 发布流程会从 `plugins/freshread/` 打包，确保专用插件 ZIP 的根目录直接包含
+`.codex-plugin/plugin.json`。不要直接修改安装缓存；应修改开发源码、通过门禁、发布新的
+语义化版本、从 Marketplace 重新安装、检查 Hook，并新建对话。
 
 ## 故障排查
 
@@ -250,7 +335,12 @@ Marketplace 重新安装并新建对话。不要直接修改安装缓存。
 | 编辑被阻止 | 从文件系统重新读取提示中的每一个目标后再重试；不要绕过 `UNKNOWN` 状态。 |
 | 状态被报告为损坏 | 仅将 `freshread clear` 作为明确的恢复操作，然后重新读取任务所需的全部文件。 |
 | Windows 上 Hook 启动失败 | 检查 Node.js 18.18+ 和受支持的 Codex 0.145.0+；在 Hook 恢复前视为防护不可用。 |
-| 更新后仍是旧行为 | 重新安装插件并新建对话；Codex 运行的是安装缓存副本。 |
+| 更新后仍是旧行为 | 升级或重新固定 Marketplace、重新安装插件、检查变化后的 Hook 并新建对话；Codex 运行的是安装缓存副本。 |
+
+## 项目协作
+
+[贡献指南](CONTRIBUTING.md) · [安全策略](SECURITY.md) ·
+[行为准则](CODE_OF_CONDUCT.md) · [变更记录](CHANGELOG.md)
 
 ## 许可证
 

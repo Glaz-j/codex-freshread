@@ -1,10 +1,13 @@
 {
   "name": "freshread",
-  "version": "0.1.0+codex.20260824060943",
+  "version": "0.1.0",
   "description": "Detect when file content remembered by Codex is no longer current, warn at lifecycle boundaries, and guard supported edits until the file is re-read.",
   "author": {
-    "name": "FreshRead contributors"
+    "name": "FreshRead contributors",
+    "url": "https://github.com/Glaz-j/codex-freshread"
   },
+  "homepage": "https://github.com/Glaz-j/codex-freshread#readme",
+  "repository": "https://github.com/Glaz-j/codex-freshread",
   "license": "MIT",
   "keywords": [
     "freshness",

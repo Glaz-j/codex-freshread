@@ -1,0 +1,20 @@
+{
+  "name": "freshread",
+  "interface": {
+    "displayName": "FreshRead Marketplace"
+  },
+  "plugins": [
+    {
+      "name": "freshread",
+      "source": {
+        "source": "local",
+        "path": "./plugins/freshread"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

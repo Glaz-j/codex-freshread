@@ -9,6 +9,10 @@ changed and stops supported edits until Codex reads the current content again.
 
 English · [简体中文](README.zh-CN.md)
 
+[![Release](https://img.shields.io/github/v/release/Glaz-j/codex-freshread?label=release)](https://github.com/Glaz-j/codex-freshread/releases/latest)
+[![CI](https://github.com/Glaz-j/codex-freshread/actions/workflows/ci.yml/badge.svg)](https://github.com/Glaz-j/codex-freshread/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 </div>
 
 > [!IMPORTANT]
@@ -71,23 +75,36 @@ expired memory of the file.
 
 ### Install
 
-FreshRead is currently distributed as a local personal-marketplace build; this
-README does not claim a public-directory listing. In an environment where this
-checkout is registered in the default personal marketplace, install it with:
+Install the stable `v0.1.0` release from the Git-backed FreshRead marketplace:
 
-```text
-codex plugin add freshread@personal
+```bash
+codex plugin marketplace add Glaz-j/codex-freshread --ref v0.1.0
+codex plugin add freshread@freshread
 ```
 
 Run the command with a supported Codex 0.145.0+ binary and verify it with
 `codex --version`. Do not rely on a legacy 0.132.0 Windows hook runner for
 FreshRead enforcement, even if that binary can discover or list the plugin.
 
-After installation or an update:
+The release page also provides the reviewable plugin ZIP and checksum:
+[FreshRead v0.1.0](https://github.com/Glaz-j/codex-freshread/releases/tag/v0.1.0).
+The marketplace commands above remain the supported installation path.
+
+> [!NOTE]
+> This repository is a Git-backed Codex marketplace. It is separate from the
+> universal public Plugins Directory shared by ChatGPT and Codex; availability
+> here does not mean FreshRead has been listed in that directory.
+
+#### Trust the lifecycle hooks
+
+Installation and enablement do not automatically trust plugin hooks. After
+every installation or update:
 
 1. Start a new Codex CLI session.
 2. Enter `/hooks` in the CLI.
-3. Review, trust, and enable the six FreshRead hook definitions.
+3. Review and trust the six FreshRead hook definitions: `SessionStart`,
+   `UserPromptSubmit`, `PreToolUse`, `PostToolUse`, `PreCompact`, and
+   `PostCompact`.
 4. Start a new Codex thread before testing the installed build.
 
 `/hooks` is a **Codex CLI command**. It is not a FreshRead command and is not
@@ -97,6 +114,66 @@ Codex records trust against the current hook-definition hash. If an update
 changes that hash, the hook is skipped until it is reviewed again. See the
 [Codex hooks documentation](https://learn.chatgpt.com/docs/hooks) for the host
 trust model.
+
+#### Preview `main`
+
+`main` is a moving development channel. Use it only when you want to test
+changes that have not yet reached a tagged release:
+
+```bash
+codex plugin marketplace add Glaz-j/codex-freshread --ref main
+codex plugin add freshread@freshread
+```
+
+Do not use the preview channel in workflows that require reproducible installs.
+
+#### Upgrade
+
+To refresh an installation that already follows `main`:
+
+```bash
+codex plugin marketplace upgrade freshread
+codex plugin remove freshread@freshread
+codex plugin add freshread@freshread
+```
+
+Published FreshRead tags are never intentionally moved. To move a stable
+installation to a newer tag, replace `v0.2.0` below with the release you have
+reviewed:
+
+```bash
+codex plugin remove freshread@freshread
+codex plugin marketplace remove freshread
+codex plugin marketplace add Glaz-j/codex-freshread --ref v0.2.0
+codex plugin add freshread@freshread
+```
+
+Review and trust the current hooks again when their definition hash changes,
+then start a new thread.
+
+#### Roll back
+
+Re-pin the marketplace to the earlier release you want. For example:
+
+```bash
+codex plugin remove freshread@freshread
+codex plugin marketplace remove freshread
+codex plugin marketplace add Glaz-j/codex-freshread --ref v0.1.0
+codex plugin add freshread@freshread
+```
+
+Run `/hooks`, review the restored definitions, and start a new thread.
+
+#### Uninstall
+
+```bash
+codex plugin remove freshread@freshread
+codex plugin marketplace remove freshread
+```
+
+The second command removes the configured FreshRead marketplace. Uninstalling
+stops the hooks but may not delete historical data under `PLUGIN_DATA`; see
+[Privacy and security](#privacy-and-security).
 
 ### Use it
 
@@ -197,7 +274,8 @@ Deliberately not treated as reliable snapshots:
   identifier.
 
 Unsupported reads continue normally but do not refresh the Read Set. See
-[Coverage and known risks](docs/COVERAGE.md) for the complete contract.
+[Coverage and known risks](plugins/freshread/docs/COVERAGE.md) for the complete
+contract.
 
 ## Privacy and security
 
@@ -244,51 +322,68 @@ eligibility also requires the deterministic and live reports to match the same
 source digest. The checked-in matching deterministic, security, performance,
 and live Codex app-server gates pass.
 
-- [Latest deterministic benchmark](benchmarks/results/latest.md)
-- [Latest live Codex A/B](benchmarks/results/live-latest.md)
-- [Benchmark contract](docs/BENCHMARK.md)
+- [Latest deterministic benchmark](plugins/freshread/benchmarks/results/latest.md)
+- [Latest live Codex A/B](plugins/freshread/benchmarks/results/live-latest.md)
+- [Benchmark contract](plugins/freshread/docs/BENCHMARK.md)
 
 The evidence proves the deliberately canonical supported workflow. It is not a
-claim of whole-workspace or operating-system audit coverage. The current live
-release evidence is Windows-based; other platform launchers do not yet carry the
-same end-to-end live A/B qualification claim. Resume and compaction scenarios
-remain deterministic/synthetic evidence unless a report explicitly labels them
-as live.
+claim of whole-workspace or operating-system audit coverage. Windows has passed
+the release-qualifying live Codex A/B gate. macOS and Linux are covered by CI
+and deterministic tests, but their launchers have not yet completed the same
+release-qualifying live A/B validation. Resume and compaction scenarios remain
+deterministic/synthetic evidence unless a report explicitly labels them as
+live.
 
 ## Development
 
 FreshRead ships runnable CommonJS files and has no compilation or `dist/` step.
 Node.js performs syntax checks and executes the plugin directly.
 
-```text
-npm run check
-npm test
-npm run benchmark
+```bash
+npm --prefix plugins/freshread run check
+npm --prefix plugins/freshread test
+npm --prefix plugins/freshread run benchmark
 ```
 
 Run the live gate only after installing the exact source build, trusting its
-current hooks, and starting a new Codex session:
+current hooks, and starting a new Codex session. Select the repository
+marketplace explicitly (the runner defaults to the local `personal`
+development marketplace):
 
-```text
-npm run benchmark:live
+```bash
+FRESHREAD_MARKETPLACE=freshread npm --prefix plugins/freshread run benchmark:live
 ```
+
+PowerShell equivalent:
+
+```powershell
+$env:FRESHREAD_MARKETPLACE = "freshread"
+npm --prefix plugins/freshread run benchmark:live
+```
+
+Alternatively, `cd plugins/freshread` first and run the corresponding `npm`
+scripts without `--prefix`.
 
 Project layout:
 
 ```text
-.codex-plugin/plugin.json   Plugin identity and UI metadata
-skills/freshread/           Model-facing workflow instructions
-hooks/hooks.json            Lifecycle registration
-scripts/                    Cross-platform launchers and hook entry points
-src/                        State machine, command analysis, and evidence logic
-tests/                      Unit, contract, edge-case, and hardening tests
-benchmarks/                 Deterministic and live A/B release gates
-docs/                       Detailed coverage and benchmark contracts
+.agents/plugins/marketplace.json      Git-backed marketplace catalog
+.github/workflows/                    CI and tagged-release automation
+plugins/freshread/.codex-plugin/      Plugin identity and UI metadata
+plugins/freshread/skills/freshread/   Model-facing workflow instructions
+plugins/freshread/hooks/              Lifecycle registration
+plugins/freshread/scripts/            Cross-platform launchers and hook entry points
+plugins/freshread/src/                State machine, analysis, and evidence logic
+plugins/freshread/tests/              Unit, contract, edge-case, and hardening tests
+plugins/freshread/benchmarks/         Deterministic and live A/B release gates
+plugins/freshread/docs/               Coverage and benchmark contracts
 ```
 
-When updating a locally installed build, edit the development source, validate
-it, update the manifest cachebuster, reinstall from the marketplace, and start a
-new thread. Do not edit the installed cache directly.
+The tagged release workflow packages `plugins/freshread/` so
+`.codex-plugin/plugin.json` is at the root of the dedicated plugin ZIP. Do not
+edit the installed cache directly; update the source, pass the gates, publish a
+new semantic version, reinstall from the marketplace, review the hooks, and
+start a new thread.
 
 ## Troubleshooting
 
@@ -299,7 +394,12 @@ new thread. Do not edit the installed cache directly.
 | An edit is blocked | Re-read every named target from the filesystem, then retry. Do not bypass an `UNKNOWN` state. |
 | State is reported as corrupt | Use `freshread clear` only as an explicit recovery action, then re-read every file needed by the task. |
 | Hook launch fails on Windows | Verify Node.js 18.18+ and a supported Codex 0.145.0+ runtime. Treat protection as unavailable until the hook is healthy. |
-| An update is not visible | Reinstall the plugin and start a new thread; Codex runs the installed cache copy. |
+| An update is not visible | Upgrade or re-pin the marketplace, reinstall the plugin, review changed hooks, and start a new thread; Codex runs the installed cache copy. |
+
+## Project
+
+[Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) ·
+[Code of Conduct](CODE_OF_CONDUCT.md) · [Changelog](CHANGELOG.md)
 
 ## License
 

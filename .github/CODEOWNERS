@@ -1,0 +1,14 @@
+# Default ownership
+* @Glaz-j
+
+# Distribution and repository policy
+/.agents/ @Glaz-j
+/.github/ @Glaz-j
+
+# Security-sensitive plugin surfaces
+/plugins/freshread/.codex-plugin/ @Glaz-j
+/plugins/freshread/hooks/ @Glaz-j
+/plugins/freshread/scripts/ @Glaz-j
+/plugins/freshread/src/ @Glaz-j
+/plugins/freshread/benchmarks/ @Glaz-j
+/SECURITY.md @Glaz-j

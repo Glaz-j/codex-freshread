@@ -1,0 +1,227 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check-and-test:
+    name: Node ${{ matrix.node }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            node: "18"
+          - os: ubuntu-22.04
+            node: "20"
+          - os: ubuntu-22.04
+            node: "22"
+          - os: windows-2022
+            node: "18"
+          - os: windows-2022
+            node: "20"
+          - os: windows-2022
+            node: "22"
+          - os: macos-15
+            node: "20"
+    defaults:
+      run:
+        working-directory: plugins/freshread
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Syntax check
+        run: npm run check
+      - name: Test
+        run: npm test
+        env:
+          NO_COLOR: "1"
+
+  release-contract:
+    name: Release contract
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Validate marketplace, manifest, README, and links
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --require-release-evidence
+
+  deterministic-benchmark:
+    name: Deterministic benchmark
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: plugins/freshread
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Run full benchmark without rewriting checked-in evidence
+        run: node benchmarks/run-benchmark.cjs --no-write-results
+        env:
+          CI: "true"
+          NO_COLOR: "1"
+
+  package:
+    name: Package release assets
+    needs:
+      - check-and-test
+      - release-contract
+      - deterministic-benchmark
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Capture reproducible source timestamp
+        run: echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct "$GITHUB_SHA")" >> "$GITHUB_ENV"
+      - name: Build release ZIP, checksums, and manifest
+        run: node tools/package-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --tag "$GITHUB_REF_NAME" --commit "$GITHUB_SHA" --out-dir dist
+      - name: Validate final release ZIP
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --zip "dist/freshread-$GITHUB_REF_NAME.zip"
+      - name: Upload verified release assets
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: freshread-${{ github.ref_name }}-release-assets
+          path: |
+            dist/freshread-${{ github.ref_name }}.zip
+            dist/SHA256SUMS
+            dist/release-manifest.json
+            dist/release-notes.md
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    name: Publish GitHub Release
+    needs:
+      - package
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tagged source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Download verified release assets
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: freshread-${{ github.ref_name }}-release-assets
+          path: dist
+      - name: Revalidate downloaded release assets
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --require-release-evidence --zip "dist/freshread-$GITHUB_REF_NAME.zip"
+      - name: Create release or refresh its assets
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const fs = require("node:fs");
+            const path = require("node:path");
+            const { owner, repo } = context.repo;
+            const tag = process.env.RELEASE_TAG;
+            const releaseBody = fs.readFileSync("dist/release-notes.md", "utf8");
+
+            await github.rest.git.getRef({ owner, repo, ref: `tags/${tag}` });
+
+            let release;
+            try {
+              release = (await github.rest.repos.getReleaseByTag({ owner, repo, tag })).data;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+              release = (await github.rest.repos.createRelease({
+                owner,
+                repo,
+                tag_name: tag,
+                name: `FreshRead ${tag}`,
+                body: releaseBody,
+                draft: false,
+                prerelease: false,
+              })).data;
+            }
+
+            if (
+              release.body !== releaseBody ||
+              release.name !== `FreshRead ${tag}` ||
+              release.draft !== false ||
+              release.prerelease !== false
+            ) {
+              release = (await github.rest.repos.updateRelease({
+                owner,
+                repo,
+                release_id: release.id,
+                name: `FreshRead ${tag}`,
+                body: releaseBody,
+                draft: false,
+                prerelease: false,
+              })).data;
+            }
+
+            const assets = [
+              { file: `dist/freshread-${tag}.zip`, type: "application/zip" },
+              { file: "dist/SHA256SUMS", type: "text/plain; charset=utf-8" },
+              { file: "dist/release-manifest.json", type: "application/json" },
+            ];
+            const existing = await github.paginate(github.rest.repos.listReleaseAssets, {
+              owner,
+              repo,
+              release_id: release.id,
+              per_page: 100,
+            });
+
+            for (const asset of assets) {
+              const name = path.basename(asset.file);
+              for (const oldAsset of existing.filter((item) => item.name === name)) {
+                await github.rest.repos.deleteReleaseAsset({
+                  owner,
+                  repo,
+                  asset_id: oldAsset.id,
+                });
+              }
+              const data = fs.readFileSync(asset.file);
+              await github.request("POST /repos/{owner}/{repo}/releases/{release_id}/assets", {
+                owner,
+                repo,
+                release_id: release.id,
+                name,
+                headers: {
+                  "content-type": asset.type,
+                  "content-length": data.length,
+                },
+                data,
+              });
+            }

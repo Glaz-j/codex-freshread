@@ -23,6 +23,7 @@ const {
   finalAgentMessageEvidence,
   readBenchmarkAudit,
   readAndValidateProof,
+  resolveMarketplaceName,
   validateMcpConfigIsolation,
   validateProviderConfigRead,
 } = require("../benchmarks/run-live-benchmark.cjs");
@@ -609,6 +610,13 @@ test("live benchmark baseline disables exactly the six FreshRead hooks per proce
     "freshread@personal:hooks/hooks.json:post_compact:0:0",
   ]) assert.match(override, new RegExp(JSON.stringify(key).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
   assert.doesNotMatch(override, /trusted_hash/);
+});
+
+test("live benchmark accepts only safe Codex marketplace identifiers", () => {
+  assert.equal(resolveMarketplaceName("freshread"), "freshread");
+  assert.equal(resolveMarketplaceName("team_1"), "team_1");
+  assert.throws(() => resolveMarketplaceName("../cache"), /valid Codex marketplace name/);
+  assert.throws(() => resolveMarketplaceName("a".repeat(65)), /valid Codex marketplace name/);
 });
 
 test("live benchmark reports missing audit evidence without losing arm diagnostics", (t) => {

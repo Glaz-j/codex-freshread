@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-and-test:
+    name: Node ${{ matrix.node }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            node: "18"
+          - os: ubuntu-22.04
+            node: "20"
+          - os: ubuntu-22.04
+            node: "22"
+          - os: windows-2022
+            node: "18"
+          - os: windows-2022
+            node: "20"
+          - os: windows-2022
+            node: "22"
+          - os: macos-15
+            node: "20"
+    defaults:
+      run:
+        working-directory: plugins/freshread
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Syntax check
+        run: npm run check
+      - name: Test
+        run: npm test
+        env:
+          NO_COLOR: "1"
+
+  release-contract:
+    name: Release contract
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Validate marketplace, manifest, README, and links
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json
+      - name: Build deterministic release ZIP smoke artifact
+        run: node tools/package-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --smoke --out-dir "$RUNNER_TEMP/freshread-release"
+      - name: Validate release ZIP root structure
+        run: node tools/validate-release.mjs --plugin-root plugins/freshread --marketplace .agents/plugins/marketplace.json --allow-unqualified --zip-dir "$RUNNER_TEMP/freshread-release"
+
+  deterministic-benchmark:
+    name: Deterministic benchmark
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: plugins/freshread
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+      - name: Run full benchmark without rewriting checked-in evidence
+        run: node benchmarks/run-benchmark.cjs --no-write-results
+        env:
+          CI: "true"
+          NO_COLOR: "1"

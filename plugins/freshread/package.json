@@ -4,6 +4,15 @@
   "private": true,
   "description": "File-context freshness guardrails for Codex.",
   "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Glaz-j/codex-freshread.git",
+    "directory": "plugins/freshread"
+  },
+  "bugs": {
+    "url": "https://github.com/Glaz-j/codex-freshread/issues"
+  },
+  "homepage": "https://github.com/Glaz-j/codex-freshread#readme",
   "engines": {
     "node": ">=18.18"
   },

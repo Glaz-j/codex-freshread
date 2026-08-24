@@ -54,8 +54,10 @@ Overall release eligibility requires a separate live Codex A/B PASS bound to the
 same source digest.
 Run it after installing the final plugin build with `npm run benchmark:live`;
 set `FRESHREAD_CODEX_BIN` when the desired current Codex executable is not on
-`PATH`. Review and trust the exact installed FreshRead definitions in `/hooks`
-first. The runner requires all six definitions to report `trusted` before it
+`PATH`. The runner uses the `personal` marketplace by default; set
+`FRESHREAD_MARKETPLACE=freshread` when validating the public Git-backed
+marketplace installation. Review and trust the exact installed FreshRead
+definitions in `/hooks` first. The runner requires all six definitions to report `trusted` before it
 starts either model turn; it does not use a blanket trust bypass. The live runner
 talks to that executable's app-server over stdio, uses
 fresh ephemeral threads and the workspace-write sandbox, and writes

@@ -1,0 +1,75 @@
+name: Feature request / 功能建议
+description: Propose a focused improvement to FreshRead.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        FreshRead intentionally has a conservative, finite protection surface.
+        Explain the user problem and how the proposal preserves clear safety
+        boundaries.
+
+        FreshRead 的保护范围是明确且保守的。请说明真实场景，以及新功能如何保持清晰的安全边界。
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem
+      description: What workflow is blocked or unsafe today? Avoid proposing only an implementation.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe observable behavior, including failure and denial behavior.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example
+    attributes:
+      label: Example workflow
+      description: Show a small before/after scenario using synthetic paths and content.
+    validations:
+      required: true
+
+  - type: textarea
+    id: safety
+    attributes:
+      label: Coverage and safety impact
+      description: Which hooks, tools, commands, paths, platforms, state transitions, or trust boundaries change?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: How do users handle this today, and why is that insufficient?
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - I can prepare a pull request
+        - I can help test the change
+        - I am proposing the idea only
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I checked for an existing issue or pull request.
+          required: true
+        - label: I reviewed the documented coverage and known limitations.
+          required: true
+        - label: I agree to follow the Code of Conduct.
+          required: true

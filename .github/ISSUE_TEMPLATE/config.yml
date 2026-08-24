@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private security report / 私密安全报告
+    url: https://github.com/Glaz-j/codex-freshread/security/advisories/new
+    about: Do not disclose vulnerabilities in a public issue. 请勿在公开 Issue 中披露漏洞。
+  - name: Documentation / 使用文档
+    url: https://github.com/Glaz-j/codex-freshread#readme
+    about: Check installation, coverage, and troubleshooting guidance before filing.

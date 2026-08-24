@@ -22,6 +22,7 @@ const MAX_PROTOCOL_BYTES = 32 * 1024 * 1024;
 const MAX_STDERR_BYTES = 1024 * 1024;
 const EXPECTED_LIVE_MODEL = "gpt-5.6-sol";
 const EXPECTED_LIVE_PROVIDER = "openai";
+const PLUGIN_NAME = "freshread";
 const MAX_MCP_SERVER_COUNT = 256;
 const MAX_MCP_OVERRIDE_BYTES = 16 * 1024;
 const MAX_HOOK_OVERRIDE_BYTES = 8 * 1024;
@@ -35,14 +36,6 @@ const HOOK_CONFIG_EVENTS = Object.freeze([
   ["PreCompact", "preCompact"],
   ["PostCompact", "postCompact"],
 ]);
-const EXPECTED_HOOK_KEYS = Object.freeze({
-  sessionStart: "freshread@personal:hooks/hooks.json:session_start:0:0",
-  userPromptSubmit: "freshread@personal:hooks/hooks.json:user_prompt_submit:0:0",
-  preToolUse: "freshread@personal:hooks/hooks.json:pre_tool_use:0:0",
-  postToolUse: "freshread@personal:hooks/hooks.json:post_tool_use:0:0",
-  preCompact: "freshread@personal:hooks/hooks.json:pre_compact:0:0",
-  postCompact: "freshread@personal:hooks/hooks.json:post_compact:0:0",
-});
 const TOOL_ACTION_TYPES = new Set([
   "commandExecution", "fileChange", "mcpToolCall", "dynamicToolCall",
   "collabAgentToolCall", "subAgentActivity", "webSearch", "imageView",
@@ -79,6 +72,25 @@ function benchmarkError(code, message) {
   error.code = code;
   return error;
 }
+
+function resolveMarketplaceName(value = process.env.FRESHREAD_MARKETPLACE) {
+  const marketplace = value || "personal";
+  if (typeof marketplace !== "string" || marketplace.length > 64 || !/^[A-Za-z0-9_-]+$/.test(marketplace)) {
+    throw benchmarkError("MARKETPLACE_NAME_INVALID", "FRESHREAD_MARKETPLACE must be a valid Codex marketplace name");
+  }
+  return marketplace;
+}
+
+const MARKETPLACE_NAME = resolveMarketplaceName();
+const PLUGIN_ID = `${PLUGIN_NAME}@${MARKETPLACE_NAME}`;
+const EXPECTED_HOOK_KEYS = Object.freeze({
+  sessionStart: `${PLUGIN_ID}:hooks/hooks.json:session_start:0:0`,
+  userPromptSubmit: `${PLUGIN_ID}:hooks/hooks.json:user_prompt_submit:0:0`,
+  preToolUse: `${PLUGIN_ID}:hooks/hooks.json:pre_tool_use:0:0`,
+  postToolUse: `${PLUGIN_ID}:hooks/hooks.json:post_tool_use:0:0`,
+  preCompact: `${PLUGIN_ID}:hooks/hooks.json:pre_compact:0:0`,
+  postCompact: `${PLUGIN_ID}:hooks/hooks.json:post_compact:0:0`,
+});
 
 function publicFailure(error) {
   const code = error && typeof error.code === "string" && /^[A-Z0-9_]{3,80}$/.test(error.code)
@@ -228,7 +240,7 @@ function expectedHookContract(hooks) {
 function installedPluginEvidence(sourceDigest) {
   const manifest = JSON.parse(fs.readFileSync(path.join(pluginRoot, ".codex-plugin", "plugin.json"), "utf8"));
   const codexHome = path.resolve(process.env.CODEX_HOME || path.join(os.homedir(), ".codex"));
-  const cacheRoot = path.join(codexHome, "plugins", "cache", "personal", "freshread", manifest.version);
+  const cacheRoot = path.join(codexHome, "plugins", "cache", MARKETPLACE_NAME, PLUGIN_NAME, manifest.version);
   const cacheRootEntry = fs.lstatSync(cacheRoot);
   if (cacheRootEntry.isSymbolicLink() || !cacheRootEntry.isDirectory()) {
     throw new Error("installed FreshRead cache root must be a non-link directory");
@@ -243,8 +255,8 @@ function installedPluginEvidence(sourceDigest) {
     cacheDigest.digest === sourceDigest.digest &&
     cacheDigest.fileCount === sourceDigest.fileCount;
   return {
-    marketplace: "personal",
-    plugin: "freshread",
+    marketplace: MARKETPLACE_NAME,
+    plugin: PLUGIN_NAME,
     version: manifest.version,
     cachePath: cacheRealPath,
     cacheDigest,
@@ -1044,7 +1056,7 @@ function hookDiscoveryEvidence(response, workspace, expectedSourcePath, expected
   const entries = Array.isArray(response && response.data) ? response.data : [];
   const entry = entries.find((item) => item && samePath(item.cwd, workspace));
   const hooks = Array.isArray(entry && entry.hooks) ? entry.hooks : [];
-  const pluginHooks = hooks.filter((hook) => hook && hook.pluginId === "freshread@personal");
+  const pluginHooks = hooks.filter((hook) => hook && hook.pluginId === PLUGIN_ID);
   const eventNames = pluginHooks.map((hook) => hook.eventName).sort();
   const warnings = entries.flatMap((item) => Array.isArray(item && item.warnings) ? item.warnings : []);
   const errors = entries.flatMap((item) => Array.isArray(item && item.errors) ? item.errors : []);
@@ -1059,7 +1071,7 @@ function hookDiscoveryEvidence(response, workspace, expectedSourcePath, expected
       (hook.additionalContextLimit ?? null) === expected.additionalContextLimit &&
       hook.handlerType === "command" && hook.command === expected.command && hook.async === false &&
       hook.enabled === expectedEnabled && hook.isManaged === false && hook.source === "plugin" &&
-      hook.pluginId === "freshread@personal" && samePath(hook.sourcePath, expectedSourcePath) &&
+      hook.pluginId === PLUGIN_ID && samePath(hook.sourcePath, expectedSourcePath) &&
       hook.key === EXPECTED_HOOK_KEYS[hook.eventName] &&
       typeof hook.currentHash === "string" && /^sha256:[0-9a-f]{64}$/.test(hook.currentHash) &&
       hook.trustStatus === "trusted";
@@ -1099,7 +1111,7 @@ function hookExecutionEvidence(events, expectedSourcePath, threadId, turnId, ena
   const targetHookEvents = events.filter((event) => event && ["hook/started", "hook/completed"].includes(event.method) &&
     event.params && event.params.threadId === threadId && event.params.turnId === turnId && event.params.run);
   const isFreshReadRun = (run) => run.source === "plugin" && samePath(run.sourcePath, expectedSourcePath) &&
-    (!Object.hasOwn(run, "pluginId") || run.pluginId === null || run.pluginId === "freshread@personal");
+    (!Object.hasOwn(run, "pluginId") || run.pluginId === null || run.pluginId === PLUGIN_ID);
   const foreignHookLifecycleEvents = targetHookEvents.filter((event) => {
     const run = event.params.run;
     return !isFreshReadRun(run);
@@ -1797,7 +1809,7 @@ function writeArtifactSet(report, eventEvidence) {
       sha256: sha256(Buffer.from(eventBytes, "utf8")),
     },
   };
-  const markdown = `${renderMarkdown(boundReport)}\n`;
+  const markdown = `${renderMarkdown(boundReport).trimEnd()}\n`;
   const json = `${JSON.stringify(boundReport, null, 2)}\n`;
   atomicWrite(eventArtifactPath, eventBytes);
   atomicWrite(resultMarkdownPath, markdown);
@@ -1952,6 +1964,7 @@ module.exports = {
   mcpServerInventoryFromRead,
   readBenchmarkAudit,
   readAndValidateProof,
+  resolveMarketplaceName,
   validateMcpConfigIsolation,
   validateProviderConfigRead,
 };

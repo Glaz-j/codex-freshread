@@ -1752,7 +1752,7 @@ function writeArtifacts(report, jsonPath) {
   const coveragePath = path.join(directory, "coverage.json");
   fs.mkdirSync(directory, { recursive: true });
   fs.writeFileSync(resolvedJson, JSON.stringify(report, null, 2) + "\n");
-  fs.writeFileSync(markdownPath, reportMarkdown(report) + "\n");
+  fs.writeFileSync(markdownPath, reportMarkdown(report).trimEnd() + "\n");
   fs.writeFileSync(coveragePath, JSON.stringify(coverageArtifact(report), null, 2) + "\n");
   return { json: resolvedJson, markdown: markdownPath, coverage: coveragePath };
 }

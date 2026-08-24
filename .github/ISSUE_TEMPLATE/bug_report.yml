@@ -1,0 +1,137 @@
+name: Bug report / 缺陷报告
+description: Report a reproducible FreshRead defect that is not security-sensitive.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a problem. Security vulnerabilities must be
+        reported privately through the link in SECURITY.md.
+
+        感谢反馈。安全漏洞请按照 SECURITY.md 私下报告，不要在这里公开利用细节。
+
+  - type: input
+    id: freshread-version
+    attributes:
+      label: FreshRead version
+      description: Release tag and plugin manifest version, if available.
+      placeholder: "v0.1.0 / 0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: codex-version
+    attributes:
+      label: Codex version
+      description: Paste the output of codex --version.
+      placeholder: "codex-cli x.y.z"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Paste the output of node --version.
+      placeholder: "v20.x.x"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-source
+    attributes:
+      label: Installation source
+      options:
+        - Git-backed Marketplace
+        - GitHub Release archive
+        - Local development checkout
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: hook-state
+    attributes:
+      label: FreshRead hook state
+      description: Review the current definitions in Codex before answering.
+      options:
+        - All current hooks trusted and enabled
+        - One or more hooks untrusted or disabled
+        - Hook discovery failed
+        - Unknown
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem
+      description: What happened, and why is it a FreshRead defect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Use a synthetic workspace and list exact steps, hook event, tool, and path form.
+      placeholder: |
+        1. Install...
+        2. Read...
+        3. Change...
+        4. Attempt...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include sanitized errors or logs if useful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: |
+        Add only sanitized evidence. Do not include tokens, private file content,
+        usernames, or unnecessary absolute paths.
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I checked the current README, coverage documentation, and troubleshooting guidance.
+          required: true
+        - label: I reproduced this with the exact FreshRead version stated above.
+          required: true
+        - label: I removed secrets, private file content, and unnecessary personal paths.
+          required: true
+        - label: This report does not disclose a security vulnerability.
+          required: true
+        - label: I agree to follow the Code of Conduct.
+          required: true

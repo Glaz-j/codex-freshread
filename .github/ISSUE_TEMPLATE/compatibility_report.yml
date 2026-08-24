@@ -1,0 +1,104 @@
+name: Compatibility report / 兼容性报告
+description: Report installation or lifecycle behavior on a specific Codex and platform combination.
+title: "[Compatibility]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for platform, launcher, installation, hook-discovery, or
+        version compatibility. Use the private security channel for bypasses or
+        unsafe execution.
+
+        此模板用于平台、启动器、安装、Hook 发现或版本兼容性问题。安全绕过请私下报告。
+
+  - type: input
+    id: freshread-version
+    attributes:
+      label: FreshRead version
+      placeholder: "v0.1.0 / manifest version"
+    validations:
+      required: true
+
+  - type: input
+    id: codex-version
+    attributes:
+      label: Codex version
+      placeholder: "codex-cli x.y.z"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      placeholder: "v20.x.x"
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: Include OS name, version, architecture, and shell.
+      placeholder: "Windows 11 x64, PowerShell 7"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-source
+    attributes:
+      label: Installation source
+      options:
+        - Git-backed Marketplace
+        - GitHub Release archive
+        - Local development checkout
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: marketplace
+    attributes:
+      label: Marketplace and installation result
+      description: List sanitized commands and whether plugin discovery, installation, and upgrade succeeded.
+    validations:
+      required: true
+
+  - type: textarea
+    id: hooks
+    attributes:
+      label: Hook discovery and trust result
+      description: State how many FreshRead hooks were discovered and whether current definitions were trusted and enabled.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction and observed behavior
+      description: Use an isolated synthetic workspace and include sanitized output.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: I started a new Codex session/thread after installation or upgrade.
+          required: true
+        - label: I checked the current hook definitions rather than relying on prior trust.
+          required: true
+        - label: I removed secrets, private content, usernames, and unnecessary absolute paths.
+          required: true
+        - label: This report does not disclose a security vulnerability.
+          required: true

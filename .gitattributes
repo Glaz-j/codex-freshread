@@ -1,0 +1,27 @@
+* text=auto eol=lf
+
+# Source, configuration, and documentation
+*.cjs text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.ps1 text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+
+# Native Windows command files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets and release archives
+*.gif binary
+*.ico binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.pdf binary
+*.tar binary
+*.gz binary
+*.zip binary

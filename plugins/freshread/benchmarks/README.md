@@ -129,3 +129,8 @@ bound latest artifacts. This live artifact is the separate evidence needed by
 release orchestration; the deterministic report itself never claims overall
 release eligibility. C06 resume and C07 compaction remain deterministic and
 synthetic hook-protocol evidence rather than live claims.
+
+The live runner targets the `personal` marketplace by default. When validating
+the public Git-backed marketplace, set `FRESHREAD_MARKETPLACE=freshread` in the
+runner environment. Marketplace names are validated with Codex's identifier
+rules before they are used to resolve the installed cache or hook IDs.
