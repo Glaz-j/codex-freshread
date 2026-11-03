@@ -1,0 +1,72 @@
+name: Dependency update validation
+on:
+  push:
+    branches: [qualification/dependency-validation-20261103]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  upload:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "20"
+      - name: Build smoke release assets
+        run: |
+          node tools/package-release.mjs --smoke --out-dir dist
+          node tools/validate-release.mjs --allow-unqualified --zip-dir dist
+          cd dist
+          sha256sum * > roundtrip.sha256
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: dependency-validation-release-assets
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 14
+  download-and-verify:
+    needs: upload
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "20"
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+        with:
+          name: dependency-validation-release-assets
+          path: dist
+      - name: Verify every downloaded byte and archive contract
+        run: |
+          cd dist
+          sha256sum --check roundtrip.sha256
+          cd ..
+          node tools/validate-release.mjs --allow-unqualified --zip-dir dist
+      - name: Verify github-script runtime and read-only GitHub API
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3
+        with:
+          script: |
+            const assert = require('node:assert/strict');
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const { owner, repo } = context.repo;
+            assert.equal(owner, 'Glaz-j');
+            assert.equal(repo, 'codex-freshread');
+            const workflow = fs.readFileSync('.github/workflows/release.yml', 'utf8');
+            const marker = '          script: |\n';
+            assert.ok(workflow.includes(marker));
+            const script = workflow.split(marker)[1].split('\n').map(line => line.replace(/^            /, '')).join('\n');
+            const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+            new AsyncFunction('github', 'context', 'require', script);
+            for (const name of ['getReleaseByTag', 'createRelease', 'updateRelease', 'listReleaseAssets', 'deleteReleaseAsset', 'uploadReleaseAsset']) {
+              assert.equal(typeof github.rest.repos[name], 'function', name);
+            }
+            assert.equal(typeof github.paginate, 'function');
+            const ref = await github.rest.git.getRef({ owner, repo, ref: 'heads/main' });
+            assert.match(ref.data.object.sha, /^[a-f0-9]{40}$/);
+            assert.ok(fs.readdirSync('dist').some(name => path.extname(name) === '.zip'));
+            core.info('PASS: artifact round-trip, release-script syntax, REST methods, CommonJS modules and authenticated read-only API');
+            await core.summary.addHeading('Dependency update validation').addRaw('Passed exact-SHA artifact upload/download with SHA-256 checks, archive validation, and github-script runtime/API compatibility. Smoke package only; no release created or modified.').write();
